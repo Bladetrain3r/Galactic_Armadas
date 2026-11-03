@@ -14,14 +14,14 @@ Where a test needs a rule the owner has not set, the box uses the tuning default
 
 A development scene is enough. It does not need to be a real scenario. Placeholder icons are enough.
 
-- [ ] **C-M0-01** The application opens a window, draws through SDL, and exits cleanly. _W-TEC-01, W-TEC-02_
-- [ ] **C-M0-02** The central view draws a hex grid large enough for a battle, between two sidebars. _W-FLD-01, W-UI-01_
-- [ ] **C-M0-03** The camera starts moderately zoomed in. The player can pan across the whole grid and zoom in and out. _W-FLD-02_
-- [ ] **C-M0-04** From elsewhere on the grid, the player can bring the view to their own ship, and to the hard objective, without scrolling the map by hand. _W-FLD-03_
-- [ ] **C-M0-05** Keyboard and mouse can both pan and zoom. _W-UI-06, W-UI-07_
-- [ ] **C-M0-06** A scene of at least 20,000 ship instances advances in under a second on 4 cores and 8 GB, with no other workload, while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. Ships without the action points to act are not given a decision. _W-TEC-04, W-TEC-07, W-ROL-01, W-AP-01_
-- [ ] **C-M0-07** At the starting zoom the view holds many ships, drawn as tactical icons on the holotable. _W-UI-04_
-- [ ] **C-M0-08** The first gameplay module is split by system, uses straightforward Rust, and a reader who writes little Rust can follow it. It does not rely on a stack of traits, macros, or other ceremony to say something simple. _W-TEC-05_
+- [x] **C-M0-01** The application opens a window, draws through SDL, and exits cleanly. _W-TEC-01, W-TEC-02_
+- [x] **C-M0-02** The central view draws a hex grid large enough for a battle, between two sidebars. _W-FLD-01, W-UI-01_
+- [x] **C-M0-03** The camera starts moderately zoomed in. The player can pan across the whole grid and zoom in and out. _W-FLD-02_
+- [x] **C-M0-04** From elsewhere on the grid, the player can bring the view to their own ship, and to the hard objective, without scrolling the map by hand. _W-FLD-03_
+- [x] **C-M0-05** Keyboard and mouse can both pan and zoom. _W-UI-06, W-UI-07_
+- [x] **C-M0-06** A scene of at least 20,000 ship instances advances in under a second on 4 cores and 8 GB, with no other workload, while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. Ships without the action points to act are not given a decision. _W-TEC-04, W-TEC-07, W-ROL-01, W-AP-01_
+- [x] **C-M0-07** At the starting zoom the view holds many ships, drawn as tactical icons on the holotable. _W-UI-04_
+- [x] **C-M0-08** The first gameplay module is split by system, uses straightforward Rust, and a reader who writes little Rust can follow it. It does not rely on a stack of traits, macros, or other ceremony to say something simple. _W-TEC-05_
 - [ ] **C-M0-09** That scale scene also runs inside a container limited to 4 cores and 8 GB. _W-TEC-06, W-TEC-07_
 
 ## Milestone 1 — One ship, one puzzle

@@ -1,0 +1,12 @@
+[package]
+name = "galactic-armadas"
+version = "0.1.0"
+edition = "2021"
+description = "Battles of Galactic Armadas — hex battlefield scale scene"
+license = "MIT"
+publish = false
+
+# SDL2 is compiled from source and linked into the binary. A system SDL
+# install is not required. See README for the compiler and window-system packages.
+[dependencies]
+sdl2 = { version = "0.38", features = ["bundled", "static-link"] }
