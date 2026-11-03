@@ -63,9 +63,9 @@ The same puzzle, inside the armada it belongs to.
 - [ ] **C-M2-08** The player has no command over ships outside their own ship and their squadron. Those ships still act. _W-ROL-03_
 - [ ] **C-M2-09** A ship far from the player shows a coarse facing. A ship close to the player shows its real hull facing and weapon facings. _W-FAC-02_
 - [ ] **C-M2-10** In that large battle, ships without enough action points to act are skipped, and ships with points still act. _W-AP-01_
-- [ ] **C-M2-13** A ship immediately next to the player has an interior of the same kind as the player's. A ship far from the player does not. _W-INT-02_
 - [ ] **C-M2-11** The battle states a strategic objective for each side, and the player's order is the part of their side's objective they were given. _W-ORD-02_
 - [ ] **C-M2-12** Ships of the Imperial Royal Navy and the Allied People's Naval Forces are both present and named. An Imperial ship of a class weathers more than the Alliance ship of that class. The Alliance ship hits harder. _W-FCT-01, W-FCT-02_
+- [ ] **C-M2-13** A ship immediately next to the player has an interior of the same kind as the player's. A ship far from the player does not. _W-INT-02_
 
 ## Milestone 3 — Ship, captain, crew
 
