@@ -34,18 +34,20 @@ The smallest playable battle: one player ship, one hard objective, one turn loop
 - [ ] **C-M1-04** Each turn the player sets the state of each component on their ship, and resolution uses that state. _W-CMB-02, W-SHP-01_
 - [ ] **C-M1-05** Each turn the player routes power among the decided subsystems. The gain and the loss are both visible before the turn resolves. _W-CMB-03, W-PWR-01_
 - [ ] **C-M1-06** With two named components online, a documented synergy changes a result. Turning either component off removes the synergy. _W-SHP-02_
-- [ ] **C-M1-07** The battle ends in success when its hard objective is completed. It ends in failure when the player ship is abandoned, evacuated, detonated, or disabled. _W-SCN-03, W-DMG-01, W-DMG-03, W-DMG-04_
-- [ ] **C-M1-08** A full turn — movement, facings, weapons, components, power, and end turn — can be played with the keyboard alone, and the same turn can be played with the mouse. _W-UI-06, W-UI-07_
+- [ ] **C-M1-07** The battle ends in success when its hard objective is completed. Evacuation is a loss and the run continues, with in-run progress pushed back. Abandonment without an in-game cause ends the run. How far progress moves, and which abandonments count as causeless, are [OQ-39](SPEC.md#17-open-questions) and [OQ-40](SPEC.md#17-open-questions). _W-SCN-03, W-DMG-08, W-DMG-09_
+- [ ] **C-M1-08** A full turn — movement, facings, weapons, components, power, a crew repair in the interior, and end turn — can be played with the keyboard alone, and the same turn can be played with the mouse. _W-UI-06, W-UI-07, W-INT-01_
 - [ ] **C-M1-09** During the battle the screen is two sidebars and the central grid, and weapons, components, facings, and power are readable without leaving the battle. _W-UI-01, W-CMB-01, W-CMB-02, W-CMB-03_
-- [ ] **C-M1-10** The player ship has momentum and coasts until it brakes or changes vector. Accelerating spends the whole turn. The ship never moves more than 3 hexes in that turn. _W-MOV-01, W-MOV-02_
-- [ ] **C-M1-11** Turning the hull takes time, and after a turn the hull facing and a weapon facing can disagree. _W-MOV-03, W-FAC-01_
-- [ ] **C-M1-12** Commands, including movement, spend action points. A frigate's pool is larger than a cruiser's and a battleship's. A ship with no points left receives no new decision that turn. _W-AP-01, W-AP-02, W-MOV-04_
-- [ ] **C-M1-13** The player can leave power unassigned, then put it on shields faster than they can take the same amount off a subsystem that is already drawing it. _W-PWR-04_
-- [ ] **C-M1-14** The player ship has more than one generator, distribution nodes, and power lines. Diverting a line changes what it feeds. Damaging a main line out of a generator lowers how much power can reach a subsystem. Repairing that line restores the delivery. _W-PWR-02, W-PWR-03_
-- [ ] **C-M1-15** A regular or focused hit applies repairable damage and can take a component offline. The run continues. _W-DMG-01_
-- [ ] **C-M1-16** Crippling every combat-capable component abandons the ship and fails the battle. _W-DMG-03_
-- [ ] **C-M1-17** Critical damage to cooling or to the reactor can detonate the ship and fail the battle. A hit that is not critical does not detonate it. _W-DMG-04_
-- [ ] **C-M1-18** Dry-dock damage, a massive hole or shredded chassis, ends the run. _W-DMG-02_
+- [ ] **C-M1-10** The player ship has momentum and coasts until it brakes or changes vector. Accelerating spends the whole turn and moves the ship at most 3 hexes. Braking spends the whole turn as well, because it is the same action with the force reversed. _W-MOV-01, W-MOV-02, W-MOV-05_
+- [ ] **C-M1-11** Turning the hull one hex facing costs 1 action point. After that spend, the hull facing and a weapon facing can disagree. _W-MOV-03, W-FAC-01_
+- [ ] **C-M1-12** A frigate starts with 10 action points, a cruiser with 8, and a battleship with 6. Those are the tuning starts. Commands, including movement, spend from that pool. A ship with nothing left to spend receives no new decision that turn. _W-AP-01, W-AP-02, W-AP-03, W-MOV-04_
+- [ ] **C-M1-13** Assigning one point of spare power costs exactly one action point less than taking one point off a subsystem that is already drawing power. _W-PWR-04_
+- [ ] **C-M1-14** The player ship has more than one generator, distribution nodes, and power lines. Diverting a line changes what it feeds. Damaging a main line out of a generator lowers how much power can reach a subsystem. Crew who reach that line through the interior restore the delivery. A control that never sends crew does not. _W-PWR-02, W-PWR-03, W-INT-01_
+- [ ] **C-M1-15** A hit can leave a component crippled: power or another resource routes worse, or the component shows a minor overheat or surge. The run continues. _W-DMG-01, W-DMG-05_
+- [ ] **C-M1-16** Crippling every combat-capable component abandons the ship. Whether that word is the mild crippled tier is [OQ-40](SPEC.md#17-open-questions). _W-DMG-03_
+- [ ] **C-M1-17** A component whose integrity reaches 0 enters the critical red zone and can be brought back without fabricating a new part. Critical damage to cooling or to the reactor can detonate the ship. A component that is only crippled does not detonate it. _W-DMG-04, W-DMG-06_
+- [ ] **C-M1-18** A massive hole in the ship, or a shredded chassis, ends the run. _W-DMG-02_
+- [ ] **C-M1-19** The player can move crew through the player ship's interior. Repair happens because those crew do the work at the damaged place. _W-INT-01, W-INT-02_
+- [ ] **C-M1-20** A component at dry dock is shown as a hole where it was, or as fused parts, and the ship cannot use it again until that component is replaced. _W-DMG-07_
 
 ## Milestone 2 — The battle around the ship
 
@@ -61,6 +63,7 @@ The same puzzle, inside the armada it belongs to.
 - [ ] **C-M2-08** The player has no command over ships outside their own ship and their squadron. Those ships still act. _W-ROL-03_
 - [ ] **C-M2-09** A ship far from the player shows a coarse facing. A ship close to the player shows its real hull facing and weapon facings. _W-FAC-02_
 - [ ] **C-M2-10** In that large battle, ships without enough action points to act are skipped, and ships with points still act. _W-AP-01_
+- [ ] **C-M2-13** A ship immediately next to the player has an interior of the same kind as the player's. A ship far from the player does not. _W-INT-02_
 - [ ] **C-M2-11** The battle states a strategic objective for each side, and the player's order is the part of their side's objective they were given. _W-ORD-02_
 - [ ] **C-M2-12** Ships of the Imperial Royal Navy and the Allied People's Naval Forces are both present and named. An Imperial ship of a class weathers more than the Alliance ship of that class. The Alliance ship hits harder. _W-FCT-01, W-FCT-02_
 
@@ -70,6 +73,7 @@ Progression across battles. A session that passes through all three classes is e
 
 - [ ] **C-M3-01** The player's ship moves from frigate to cruiser to battleship, and the three classes differ in component capacity or power. _W-PRG-01, W-SHP-01_
 - [ ] **C-M3-02** A ship-management subscreen is where the detailed build is inspected and edited. In-battle component control from Milestone 1 still works. _W-UI-02, W-SHP-01_
+- [ ] **C-M3-10** On that screen a component with a clear purpose can be refitted, and the chassis plumbing cannot. _W-SHP-03_
 - [ ] **C-M3-03** The captain persists from battle to battle, and at least one visible value changes because of a battle's result. _W-PRG-02_
 - [ ] **C-M3-04** The crew persists from battle to battle, and at least one visible value changes because of a battle's result. _W-PRG-03_
 - [ ] **C-M3-05** A progression subscreen shows ship class, captain, and crew, including the change from the latest battle. _W-UI-03, W-PRG-01, W-PRG-02, W-PRG-03_
@@ -143,18 +147,27 @@ Every decided wish is listed. "Shape" means the milestones produce it and no sin
 | W-MOV-02 | C-M1-10 |
 | W-MOV-03 | C-M1-11 |
 | W-MOV-04 | C-M1-12 |
+| W-MOV-05 | C-M1-10 |
 | W-FAC-01 | C-M1-03, C-M1-11 |
 | W-FAC-02 | C-M2-09 |
 | W-AP-01 | C-M0-06, C-M1-12, C-M2-10 |
 | W-AP-02 | C-M1-12 |
+| W-AP-03 | C-M1-12 |
 | W-PWR-01 | C-M1-05 |
 | W-PWR-02 | C-M1-14 |
 | W-PWR-03 | C-M1-14 |
 | W-PWR-04 | C-M1-13 |
-| W-DMG-01 | C-M1-07, C-M1-15 |
+| W-DMG-01 | C-M1-15 |
 | W-DMG-02 | C-M1-18 |
-| W-DMG-03 | C-M1-07, C-M1-16 |
-| W-DMG-04 | C-M1-07, C-M1-17 |
+| W-DMG-03 | C-M1-16 |
+| W-DMG-04 | C-M1-17 |
+| W-DMG-05 | C-M1-15 |
+| W-DMG-06 | C-M1-17 |
+| W-DMG-07 | C-M1-20 |
+| W-DMG-08 | C-M1-07 |
+| W-DMG-09 | C-M1-07 |
+| W-INT-01 | C-M1-08, C-M1-14, C-M1-19 |
+| W-INT-02 | C-M1-19, C-M2-13 |
 | W-BRD-01 | C-M6-01 |
 | W-BRD-02 | C-M6-02 |
 | W-BRD-03 | C-M6-03 |
@@ -167,6 +180,7 @@ Every decided wish is listed. "Shape" means the milestones produce it and no sin
 | W-FCT-02 | C-M2-12, C-M3-09 |
 | W-SHP-01 | C-M1-04, C-M3-01, C-M3-02 |
 | W-SHP-02 | C-M1-06, C-M3-06 |
+| W-SHP-03 | C-M3-10 |
 | W-PRG-01 | C-M3-01, C-M3-05, C-M3-06 |
 | W-PRG-02 | C-M3-03, C-M3-05 |
 | W-PRG-03 | C-M3-04, C-M3-05, C-M5-02 |

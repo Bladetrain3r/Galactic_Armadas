@@ -34,7 +34,7 @@ Decided terms. Where the mechanic is still open, the entry says so.
 | Squadron | Allied ships the player may command in a battle. Some battles have none. Composition is by class (W-SQD-01). Commands are focus, hold, protect, and follow. |
 | Squad Command | An improvable skill. A battleship squadron requires it at maximum. |
 | Order | A campaign objective shown for the battle. The hard objective agrees with it. Ignoring it has a moderately outsized campaign effect unless another ship completes it. |
-| Action points | The budget a ship spends on commands in a turn. Frigates have the largest budget. A ship that cannot afford an action is skipped. |
+| Action points | The budget a ship spends on commands in a turn. Starting values for tuning are frigate 10, cruiser 8, battleship 6. A ship that cannot afford an action is skipped. |
 | Hard objective | The single mission goal of a battle. Completing it ends the battle in success (C-M1-07). |
 | Strategic objective | What one side is trying to do in the battle. Both sides have one. The player's order is their piece of their side's objective, and the link tightens as the campaign goes on. |
 | High-value target | A marked ship or node that is not the hard objective. Destroying it improves the battle outcome. |
@@ -43,9 +43,14 @@ Decided terms. Where the mechanic is still open, the entry says so.
 | Thrust | The offensive choice on a war-map step. Uses a strike objective. |
 | Hold | The defensive choice on a war-map step. Uses a hold-until-counterattack objective. |
 | Holotable | The central battlefield view: dense tactical icons, in the role of a fleet command table. |
-| Ironman | A mode in which the escape pod fails. Ship loss ends the run, and the next start is from scratch (C-M5-03). |
-| Repairable damage | Harm from regular fire or a focused hit. It can take a component offline, disable the ship, or force an evacuation. The run continues. |
-| Dry-dock damage | A massive hole or shredded chassis. It ends the run. |
+| Ironman | A mode in which the escape pod fails. The next start is from scratch (C-M5-03). How that meets evacuation, which does not end the run, is [OQ-45](#17-open-questions). |
+| Crippled | A component tier. Mostly a resource-routing fault, or a minor overheat or surge. |
+| Critical | A component tier. Significant damage, and no new part has to be fabricated. Integrity has hit 0 and the component is in a red zone whose depth follows its durability and over-engineering. On cooling or the reactor, this tier may detonate the ship. |
+| Dry dock (component) | A hole where the component was, or major parts fused. The component has to be replaced. |
+| Dry dock (ship) | A massive hole in the ship, or a shredded chassis. Ends the run. Whether a dry-docked component is this event is [OQ-38](#17-open-questions). |
+| Evacuation | A loss that pushes in-run progress back and does not end the run. How far is [OQ-39](#17-open-questions). |
+| Abandonment | Crippling every combat-capable component abandons the ship. Abandonment without an in-game cause ends the run. Which events are the causeless ones is [OQ-40](#17-open-questions). |
+| Interior | The small FTL-like roguelike inside the player ship and most immediately proximate vessels. Crew move through it. Repair is one of their actions. |
 | Imperial Royal Navy | One of the two factions. Its ships are a little tougher. |
 | Allied People's Naval Forces | The other faction. Its ships have slightly more gun. |
 
@@ -73,22 +78,19 @@ _Checklist: C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-09, C-M1-10, C-M1-
 
 Decided:
 
-- Time is turns. Each ship has an action-point pool. Frigates have the largest pool, because they are fast and a small crew answers quickly.
+- Time is turns. Each ship has an action-point pool. Starting values, which the owner gave as a guess to tune: frigate 10, cruiser 8, battleship 6 (W-AP-03). Frigates still have the most.
 - A ship that does not have the points to do anything is skipped. The simulation does not process a decision for it.
-- The player spends points on commands for their own ship: acceleration and other vector changes, hull facing, weapon facings, component state, and power. The crew carries the commands out. Movement draws on the same pool as the other commands.
-- Acceleration is a full-turn action. That ship takes no other command while it accelerates. It moves at most 3 hexes that turn.
-- Ships have momentum. They keep their vector until they brake or change it. Turning the hull takes time.
+- The player spends points on commands for their own ship: acceleration and braking, hull facing, weapon facings, component state, and power. The crew carries the commands out. Movement draws on the same pool as the other commands.
+- Turning the hull costs 1 action point per hex facing (C-M1-11).
+- Acceleration is a full-turn action. That ship takes no other command while it accelerates. It moves at most 3 hexes that turn. Braking applies the opposite force and costs the same, so it is a full-turn action too (C-M1-10). No separate point price was stated for that shared cost.
+- Ships have momentum. They keep their vector until they brake or change it.
 - Keyboard alone can play the turn, and the mouse can play the same turn.
 
-The size of each class's pool, and how many points a hull turn or a brake costs, are [OQ-25](#17-open-questions) and [OQ-26](#17-open-questions).
-
-> **Proposal P-TURN-01 (unapproved).** Stand-in for who acts before whom ([OQ-27](#17-open-questions)).
+> **Proposal P-TURN-01 (unapproved).** Stand-in for who acts before whom ([OQ-27](#17-open-questions)). The action-point numbers above are decided and are not part of this proposal.
 >
-> 1. **Prepare.** The order, the hard objective, and both sides' strategic objectives are on screen. The player spends action points. They commit.
-> 2. **Resolve.** Ships that still have a legal command act in this order: the player ship, then squadron ships, then every other ship with enough points. Each acts on the latest state. Acceleration resolves as that ship's entire action. Weapons fire along their own facings when those weapons are online and powered. Damage, objectives, high-value targets, and intel update.
+> 1. **Prepare.** The order, the hard objective, and both sides' strategic objectives are on screen. The player spends action points, including any crew orders in the interior. They commit.
+> 2. **Resolve.** Ships that still have a legal command act in this order: the player ship, then squadron ships, then every other ship with enough points. Each acts on the latest state. Acceleration or braking resolves as that ship's entire action. Weapons fire along their own facings when those weapons are online and powered. Damage, objectives, high-value targets, and intel update.
 > 3. **Report.** The outcome readout matches those flags.
->
-> Sample pools until OQ-25 is answered: frigate 6, cruiser 4, battleship 3. Sample costs until OQ-26 is answered: one point to turn the hull one hex side, and braking is a full-turn action like acceleration. These numbers are not approved.
 
 A sample of a component synergy, used by C-M1-06, is in [§6](#6-ships-and-components). It is sample content.
 
@@ -105,7 +107,7 @@ Decided:
 - The window keeps accepting input and drawing while those ships advance. No single lock is held around the whole update. Ships without the action points to act are not given a decision.
 - Hull facing and weapon facings are separate. A ship the player is not close to may use a cheap facing approximation or a batched update. The fiction is sensor falloff: the computers spend their time on what is close (C-M2-09).
 - The player commands only their ship and, when present, their squadron.
-- Movement: momentum, coasting until brake or vector change, acceleration as a full-turn action, at most 3 hexes in a turn ([§4](#4-turn-structure)).
+- Movement: momentum, coasting until brake or vector change, acceleration and braking as the same full-turn action with opposite force, at most 3 hexes in a turn, hull turns at 1 action point per facing ([§4](#4-turn-structure)).
 
 > **Proposal P-HEX-01 (unapproved).** Axial hex coordinates `(q, r)`. Neighbors are the six axial directions, numbered 0–5, which weapon orientation reuses. Distance is cube distance.
 
@@ -125,7 +127,7 @@ Decided:
 
 ## 6. Ships and components
 
-_Checklist: C-M1-04, C-M1-06, C-M1-07, C-M1-15, C-M1-16, C-M1-17, C-M1-18, C-M3-01, C-M3-02, C-M3-06._
+_Checklist: C-M1-04, C-M1-06, C-M1-07, C-M1-15, C-M1-16, C-M1-17, C-M1-18, C-M1-20, C-M3-01, C-M3-02, C-M3-06, C-M3-10._
 
 Decided:
 
@@ -133,14 +135,19 @@ Decided:
 - Two components can form a synergy: both online, the result changes; either off, the change disappears.
 - Frigate, cruiser, and battleship differ in how much build they can hold.
 - A ship-management subscreen exists for the build (W-UI-02). What it changes beyond the in-battle controls is [OQ-24](#17-open-questions).
-- Damage has two kinds, in the spirit of Nexus: The Jupiter Incident. **Repairable** damage is regular fire or a focused hit. It can take a component offline, disable the ship, or force an evacuation, and the run goes on. **Dry-dock** damage is a massive hole or shredded chassis, and it ends the run (C-M1-18).
-- Crippling every combat-capable component abandons the ship (C-M1-16).
-- Critical damage to cooling or to the reactor may detonate the ship (C-M1-17).
-- The battle fails when the player ship is abandoned, evacuated, detonated, or disabled (C-M1-07).
+- Components are fairly fine-grained. Most components with a clear purpose are refittable. Plumbing, pipes and the like, is fixed on the chassis (W-SHP-03, C-M3-10).
+- A component's damage tiers are:
+  - **Crippled.** Mostly a resource-routing fault, or a minor overheat or surge (C-M1-15).
+  - **Critical.** Significant damage, and no new fabrication. After integrity hits 0 the component is in a red zone. The depth of that zone varies with durability and over-engineering (C-M1-17). Critical damage to cooling or to the reactor may detonate the ship.
+  - **Dry dock.** A hole where the component was, or major parts fused. It has to be replaced (C-M1-20).
+- A massive hole in the ship, or a shredded chassis, ends the run (C-M1-18). That is the earlier ship-scale rule. It uses the same words as component dry dock. [OQ-38](#17-open-questions) asks whether they are one event.
+- Crippling every combat-capable component abandons the ship (C-M1-16). "Crippled" is also the mild tier above. [OQ-40](#17-open-questions) asks whether that abandonment still means the mild tier.
+- Evacuation is a loss. It pushes in-run progress back and does not end the run (C-M1-07, W-DMG-08). How far is [OQ-39](#17-open-questions).
+- Abandonment without an in-game cause ends the run (W-DMG-09). Which abandonments that sentence covers is [OQ-40](#17-open-questions).
 
-The component catalog, and the amounts that count as crippled, critical, or dry-dock, are [OQ-04](#17-open-questions). Whether evacuation and abandonment are the same event is [OQ-33](#17-open-questions).
+Starting integrity, and the numbers for durability and over-engineering, are [OQ-37](#17-open-questions). Whether the divertable power lines are the fixed plumbing is [OQ-44](#17-open-questions).
 
-> **Proposal P-DMG-01 (unapproved).** Data-shape stand-in, not a damage curve. A component is sound or crippled. A hit is tagged `repairable` or `dry_dock`. Cooling and the reactor are subsystems; crippling either is the critical case that may detonate. The integer-hull model from the first draft is retired. Sample content may mark one weapon as dealing repairable damage and one as dealing dry-dock damage so C-M1-15 and C-M1-18 have a button to press.
+> **Proposal P-DMG-01 (unapproved).** Sample numbers for [OQ-37](#17-open-questions) only. A component starts at integrity 3. The red zone is 1 more point of damage, or 2 if the component is tagged over-engineered. A dry-dock result is a separate flag on the hit, not a deeper red zone. None of these figures is approved. The old sound-or-crippled boolean is retired.
 
 > **Proposal P-FIT-01 (unapproved).** Sample slot counts, so C-M3-01 has something to load. Power comes from generators ([§7](#7-power)), not from a single class budget. Not tuned.
 >
@@ -152,9 +159,9 @@ The component catalog, and the amounts that count as crippled, critical, or dry-
 >
 > The frigate's starting fit holds one of the two synergy parts in the sample below. The cruiser's slot count holds both. That is the C-M3-06 test. When the class actually changes is [OQ-12](#17-open-questions). The stand-in offers the cruiser refit after the third battle is resolved and the battleship refit after the seventh, as a hull change on the ship-management screen. Any other trigger replaces this.
 >
-> Stand-in for [OQ-24](#17-open-questions) and C-M3-02: between battles the ship-management subscreen fits and unfits components. Dry-dock damage is not repaired there. During a battle the sidebar toggles components that are already fitted and issues the field repair in [P-REP-01](#7-power).
+> Stand-in for [OQ-24](#17-open-questions) and C-M3-02: between battles the ship-management subscreen fits and unfits components that have a clear purpose, and does not refit plumbing. During a battle the sidebar toggles components that are already fitted. Repair is the interior, not a button on that sidebar.
 
-> **Proposal P-SYNERGY-01 (unapproved).** Sample content for C-M1-06. The real component list is [OQ-04](#17-open-questions), together with damage.
+> **Proposal P-SYNERGY-01 (unapproved).** Sample content for C-M1-06. Named parts beyond this pair are content. The refit rule is W-SHP-03.
 >
 > - `sensor_lock` (sensors): while online and powered, the current target is marked for the turn.
 > - `focused_lance` (weapons): fires along its orientation. If the target is marked, the hull damage is higher.
@@ -170,14 +177,27 @@ Decided:
 - The subsystems are drives, weapons, shields, sensors, ECM, life support, tactical computers, heat pumps, capacitors and batteries, ammo loaders, powered structural support, and doors and bulkheads.
 - A ship has multiple generators, distribution nodes through the hull, and power lines between them.
 - A line can be diverted, damaged, and repaired. A damaged line can cap how much power reaches what it feeds. A main lane leaving a generator is the case C-M1-14 tests.
-- Points may sit unassigned. Assigning unassigned power (the shield-boost case) is quicker than pulling power off a subsystem that is already drawing it, because the engineering crew rebalances the grid.
+- Points may sit unassigned. Assigning one point of spare power costs one action point less than re-allocating one point off a subsystem that is already drawing it (C-M1-13). The slower case is the engineering crew rebalancing the grid.
 - Both the gain and the loss are visible before the player commits.
+- Repair of a line is a crew action in the interior ([Interior](#interior)), not a sidebar spend.
 
-What "quicker" is measured in is [OQ-28](#17-open-questions). How the player repairs a line or a repairable component, and what it costs, is [OQ-29](#17-open-questions).
+The absolute action-point cost of moving one point off a live subsystem is [OQ-34](#17-open-questions). The spare-power discount of one is already decided, so the spare cost is that number minus one.
 
-> **Proposal P-POW-01 (unapproved).** Sample grid for one frigate, so the boxes have a layout. Two generators. Each feeds a distribution node through a main lane. Nodes feed the subsystems through branch lines. A weapon fires only if it is sound, online, and its branch can carry its cost. Diverting a branch swaps which subsystem it feeds.
->
-> **Proposal P-REP-01 (unapproved).** Stand-in for OQ-29. A repair command on a repairable crippled component or line spends one action point and clears that cripple. Dry-dock damage has no field repair.
+> **Proposal P-POW-01 (unapproved).** Sample grid for one frigate, so the boxes have a layout. Two generators. Each feeds a distribution node through a main lane. Nodes feed the subsystems through branch lines. A weapon fires only if it is sound, online, and its branch can carry its cost. Diverting a branch swaps which subsystem it feeds. Stand-in for OQ-34, not a decision: taking one point off a live subsystem costs 2 action points, so assigning one spare point costs 1.
+
+## Interior
+
+_Checklist: C-M1-08, C-M1-14, C-M1-19, C-M2-13._
+
+Decided:
+
+- Repair is a crew action (W-INT-01).
+- The player ship is a small FTL-like roguelike of its own. Crew move through the interior to repair, and to do the other work of that layer (W-INT-02).
+- Most vessels immediately proximate to the player are the same kind of interior (C-M2-13). The far armada is not.
+
+How that layer sits inside a battle turn, and what a crew move spends, is [OQ-35](#17-open-questions). What counts as a room, and how many crew are aboard, is [OQ-36](#17-open-questions). How near "immediately proximate" is is [OQ-41](#17-open-questions). Which actions the "etc." covers besides repair is [OQ-42](#17-open-questions). OQ-42 does not block the first battle: repair alone satisfies C-M1-14 and C-M1-19.
+
+> **Proposal P-INT-01 (unapproved).** Stand-in for OQ-35 and OQ-36. The interior is a second view opened from the battle. Rooms are the fitted components plus the distribution nodes, joined by the power lines. A frigate has 4 crew. During the battle turn the player orders a crew member into an adjacent room for 1 of the ship's action points. A crippled component or a damaged line is repaired when a crew member spends a further action point in its room. A dry-docked component is not repaired this way; it needs replacement. This timing and this headcount are not approved.
 
 ## 8. Weapons
 
@@ -413,7 +433,7 @@ This is the project coding guideline, in the owner's words: keep it legible and 
 
 What that means in this codebase:
 
-- Split modules by system: movement, action points, weapons, the power grid, damage, squadron orders, boarding, the war map, and rendering. A reader can open one of those and follow it.
+- Split modules by system: movement, action points, weapons, the power grid, damage, the interior, squadron orders, boarding, the war map, and rendering. A reader can open one of those and follow it.
 - Prefer plain functions, concrete structs, and straight control flow. Reach for a trait, a generic, or a macro when it removes a real repetition, not as the default shape of a feature.
 - Name things for the game (a power line, a wing, a facing), not for the pattern they implement.
 - Keep the simulation as tables of ship data, as in [§15](#15-architecture), so the hot path stays a loop a new Rust reader can trace. The type system should make "a worker does not touch SDL" obvious. It should not make a component rule hard to read.
@@ -431,13 +451,17 @@ Ordered here by what they block. The first playable battle is Milestone 1. Later
 
 | ID | Question | Blocks | Stand-in until answered |
 | --- | --- | --- | --- |
-| OQ-25 | How many action points does a frigate, a cruiser, and a battleship have? | M1 | Frigate 6, cruiser 4, battleship 3 (P-TURN-01). |
-| OQ-26 | How much time or how many points does one hex-side of hull turn cost, and does braking take the whole turn the way acceleration does? | M1 | One point per hex side. Braking is a full-turn action (P-TURN-01). |
-| OQ-28 | What is the unit of "quicker" when assigning unassigned power, versus pulling power off a live subsystem? | M1 | Assigning reserve power is free inside the turn. Pulling power off a live subsystem costs one action point. |
-| OQ-29 | How does the player repair a power line or a repairable component, and what does it cost? | M1 | One action point clears one repairable cripple (P-REP-01). Dry-dock has no field repair. |
-| OQ-04 | What is the component catalog, and what amounts count as a crippled component, critical cooling or reactor damage, and dry-dock damage? | M1 | Typed hits, components sound or crippled (P-DMG-01). The sample synergy pair stays sample content. |
-| OQ-33 | Is evacuation the same event as abandonment, or can the crew evacuate while some combat components still work? | M1 | They are separate. Abandonment is every combat component crippled. Evacuation is a command the player can issue after repairable damage has disabled the ship. |
+| OQ-34 | Taking one power point off a live subsystem costs how many action points? Spare assignment is that cost minus one per point. | M1 | 2 to take a point off a live subsystem, so spare assignment costs 1 (P-POW-01). |
+| OQ-35 | During a battle, is the interior a layer the player directs inside the turn, and what does a crew member spend to move or repair? | M1 | A second view. One ship action point moves one crew into an adjacent room, and another repairs there (P-INT-01). |
+| OQ-36 | What is a room on that map, and how many crew walk it? | M1 | Rooms are fitted components and distribution nodes. A frigate has 4 crew (P-INT-01). |
+| OQ-37 | What integrity does a component start with, and how do durability and over-engineering set the depth of the red zone after 0? | M1 | Integrity 3, red zone 1, or 2 if over-engineered (P-DMG-01). |
+| OQ-38 | Does a dry-docked component (a hole where it was, or fused parts that must be replaced) end the run, or is the run-ending case only the ship-scale shredded chassis? | M1 | Only the shredded chassis ends the run. A dry-docked component waits for replacement. |
+| OQ-39 | How far does evacuation push in-run progress back? | M1 | Back to the start of the current battle, ship and crew kept. |
+| OQ-40 | Which abandonments are "without an in-game cause"? Does crippling every combat-capable component, which already abandons the ship, count as that run-ending case, or as a caused abandonment with a different result? | M1 | Causeless means the player leaves a ship that still has a working combat component. The all-components-crippled case stays an abandonment caused by damage and does not, by itself, end the run. |
+| OQ-44 | Are the divertable, repairable power lines the plumbing that is fixed per chassis, or are they separate from those pipes? | M1 | Power lines stay divertable and repairable. Plumbing is a different, fixed set of pipes. |
 | OQ-27 | Among ships that have enough action points, who acts first? | M2 | Player, then squadron, then the rest, each on the latest state (P-TURN-01). |
+| OQ-41 | How near is "immediately proximate" for a ship that has an interior? | M2 | Adjacent hexes only. |
+| OQ-42 | Besides repair, what do crew do in the interior? | After M1 repair works | Nothing else until named. |
 | OQ-17 | Do ships far from the player simulate the power grid and component damage, or only the decided coarse facing and the action-point skip? | M2 | Far ships are a volley stat plus one facing (P-SIM-01). |
 | OQ-06 | Is a ship of the line a battleship or another hull, and is a strike craft its own ship or only a count on a wing? | M2, M3 | A ship of the line is a battleship that is not the flagship. A wing is one instance with a craft count (P-WING-01). |
 | OQ-08 | What does the player do to gather intel? | M2 | Scan a marked contact. Destroying it does not count (P-OUT-01). |
@@ -446,11 +470,12 @@ Ordered here by what they block. The first playable battle is Milestone 1. Later
 | OQ-30 | What is Squad Command's maximum, what raises it, and is there a gate below a battleship squadron? | M3 | Levels 0–3, up one when the squadron's order is carried out. No gate below battleship (P-SKL-01). |
 | OQ-12 | What triggers frigate to cruiser to battleship, and is the change a refit or a new hull? | M3 | Refit offered after battle 3 and battle 7 (P-FIT-01). |
 | OQ-13 | Which captain and crew attributes exist besides Squad Command, and what changes them? | M3 | Citations and crew experience (P-PRG-01). |
-| OQ-24 | What does the ship-management subscreen change that the battle sidebars do not? | M3 | The subscreen fits and unfits components. The battle screen toggles them and issues field repair. |
+| OQ-24 | What does the ship-management subscreen change that the battle sidebars do not? | M3 | The subscreen fits and unfits purpose-built components and leaves plumbing fixed. The battle screen toggles fitted components. Repair is the interior. |
 | OQ-32 | What are the one or two special components each faction has, the ones the other side must capture? | M3 | Imperial `belt_plate`, Alliance `rapid_mount` (P-FCT-01). |
 | OQ-07 | How large is the "moderately outsized" campaign effect of an ignored order, and by what steps does the link to the strategic objective tighten across the ten battles? | M4 | The ignored order shifts the next battle's outcome lines by one step, and the link is a sentence in battle 1 and a second fail condition in battle 10. |
 | OQ-11 | Can the war end before ten battles? | M4 | All ten steps are played. |
 | OQ-31 | How does a boarding start, what is "in time", and what are the map and the standard gear? | M6, not M1 | Focus-to-capture on a fully crippled ship. Eight battle-turns. A corridor, a sidearm, and a cutter (P-BRD-01). |
+| OQ-45 | Ironman says the escape pod fails and the run starts over. Evacuation is a loss that does not end the run. Does ironman turn an evacuation into a run-ending loss? | M5, not M1 | Ironman ends the run on evacuation. A normal run takes the progress setback. |
 | OQ-14 | When is the veteran chance rolled, and what does a veteran change? | M5 | Once at run start, 1 in 10, starting experience 2 (P-VET-01). |
 | OQ-15 | Do medals persist across runs, and does ironman clear that store too? | M5 | Medals live inside the run. Ironman discards them with the run (P-MEDAL-01). |
 | OQ-16 | Is there save and reload when ironman is off? | M5 | The run is in memory only. |
@@ -464,10 +489,16 @@ Moved into the decided sections. The ids are kept so older notes still point som
 
 | ID | Now decided as |
 | --- | --- |
-| OQ-01 | Momentum, coasting, acceleration as a full-turn action, max 3 hexes. Costs of turning and braking remain OQ-26. |
+| OQ-01 | Momentum, coasting, acceleration as a full-turn action, max 3 hexes. A hull turn is 1 action point per facing. Braking costs the same as acceleration. |
 | OQ-02 | Separate hull and weapon facings. Distant ships use a cheap approximation. |
-| OQ-03 | The subsystem list, the generator and line grid, and unassigned power. The unit of "quicker" remains OQ-28. |
-| OQ-05 | Action points. Frigates have the most. Ships that cannot act are skipped. Amounts remain OQ-25. |
+| OQ-03 | The subsystem list, the generator and line grid, and unassigned power. Spare power costs one action point less per point than taking power off a live subsystem. The base cost remains OQ-34. |
+| OQ-04 | Component tiers: crippled, critical (red zone after integrity 0), dry dock (replace the part). Refittable when they have a clear purpose. Plumbing fixed per chassis. Numbers remain OQ-37. |
+| OQ-05 | Action points. Frigates have the most. Starting pools for tuning: 10, 8, and 6. |
+| OQ-25 | Closed with OQ-05. Frigate 10, cruiser 8, battleship 6, as tuning starts. |
+| OQ-26 | Hull turn is 1 action point per hex facing. Braking is the opposite force to acceleration and costs the same full turn. |
+| OQ-28 | Closed with OQ-03. The discount is one action point per power point. |
+| OQ-29 | Repair is a crew action inside the interior roguelike. |
+| OQ-33 | Evacuation sets in-run progress back and does not end the run. Abandonment without an in-game cause ends the run. The reach of those two sentences remains OQ-39 and OQ-40. |
 | OQ-18 | Imperial Royal Navy and Allied People's Naval Forces. Component names remain OQ-32. |
 | OQ-19 | Windows and Linux. |
 | OQ-23 | Rust, under the coding guideline in §16. |
@@ -481,8 +512,9 @@ Moved into the decided sections. The ids are kept so older notes still point som
 | 3 War and battles | C-M4-01–C-M4-08, C-M2-07, C-M2-11 |
 | 4 Turn structure | C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-10–C-M1-12, C-M0-06, C-M2-10 |
 | 5 Battlefield and scale | C-M0-02–C-M0-04, C-M0-06, C-M0-07, C-M1-10, C-M2-01, C-M2-08, C-M2-09 |
-| 6 Ships and components | C-M1-04, C-M1-06, C-M1-07, C-M1-15–C-M1-18, C-M3-01, C-M3-02, C-M3-06 |
+| 6 Ships and components | C-M1-04, C-M1-06, C-M1-07, C-M1-15–C-M1-18, C-M1-20, C-M3-01, C-M3-02, C-M3-06, C-M3-10 |
 | 7 Power | C-M1-05, C-M1-09, C-M1-13, C-M1-14 |
+| Interior | C-M1-08, C-M1-14, C-M1-19, C-M2-13 |
 | 8 Weapons | C-M1-03, C-M1-11, C-M2-09 |
 | 9 Objectives and intel | C-M1-01, C-M1-02, C-M1-07, C-M2-02–C-M2-05, C-M2-07, C-M4-04, C-M4-06 |
 | 10 Orders and squadron | C-M1-02, C-M2-06, C-M2-08, C-M2-11, C-M3-07, C-M3-08, C-M4-07, C-M4-08 |
@@ -503,15 +535,15 @@ Unapproved, and still this planning pass's own ideas. Stretch wishes in the wish
 | ID | Where | What it stands in for |
 | --- | --- | --- |
 | P-WAR-MAP | §3 | Map of ten steps, two choices, outcome lines stored |
-| P-TURN-01 | §4 | Who acts first, and sample action-point numbers |
+| P-TURN-01 | §4 | Who acts first |
 | P-HEX-01 | §5 | Axial hexes, directions 0–5 |
 | P-SIM-01 | §5 | What far ships simulate besides facing and the action-point skip |
 | P-SIM-02 | §5 | Snapshot buffer to the renderer |
-| P-DMG-01 | §6 | Sound-or-crippled components, typed hits |
+| P-DMG-01 | §6 | Sample integrity and red-zone depth |
 | P-FIT-01 | §6 | Sample slot and generator counts, sample refit timing |
 | P-SYNERGY-01 | §6 | Sample component pair |
-| P-POW-01 | §7 | Sample two-generator layout |
-| P-REP-01 | §7 | Field repair costs one action point |
+| P-POW-01 | §7 | Sample two-generator layout, and a sample base cost of 2 action points |
+| P-INT-01 | Interior | Sample rooms, crew count, and move cost |
 | P-WPN-01 | §8 | Facings as hex directions, sample "close" radius of 8 |
 | P-OUT-01 | §9 | Three-line outcome, sample strike, hold, and intel |
 | P-WING-01 | §10 | A wing is one instance with a craft count |
@@ -527,5 +559,5 @@ Unapproved, and still this planning pass's own ideas. Stretch wishes in the wish
 | P-DAT-01 | §14 | TOML content files |
 | P-ARC-01 | §15 | Content, simulation, presentation, command buffer |
 
-Retired, because the owner answered them: the old hull-point destruction rule, the four-subsystem power budget that had to be fully assigned, the squadron of three with only focus and hold, the macOS platform guess, and the unapproved language recommendation.
+Retired, because the owner answered them: the old hull-point destruction rule, the one-action-point sidebar repair (P-REP-01), the four-subsystem power budget that had to be fully assigned, the squadron of three with only focus and hold, the macOS platform guess, and the unapproved language recommendation.
 

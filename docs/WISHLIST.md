@@ -46,7 +46,8 @@ Tone and craft references, with this game's own mechanics: Rift Wizard and Deskt
 | --- | --- | --- |
 | W-MOV-01 | Must | Ships have momentum. They coast on their vector until they brake or change vector. |
 | W-MOV-02 | Must | Acceleration is a full-turn action. A ship moves at most 3 hexes in a turn. |
-| W-MOV-03 | Must | Turning the hull takes time. |
+| W-MOV-03 | Must | Turning the hull costs 1 action point per hex facing. |
+| W-MOV-05 | Must | Braking is acceleration with the force reversed, so it costs the same as accelerating. |
 | W-MOV-04 | Must | Movement commands spend the same action-point budget as other commands. The crew carries the orders out. |
 | W-FAC-01 | Must | The hull and the weapons have separate facings. |
 | W-FAC-02 | Must | Ships the player is not close to use a cheap facing approximation or a batch. In the fiction, sensor detail falls off with distance because the ship's computers prioritize what is close. |
@@ -57,6 +58,7 @@ Tone and craft references, with this game's own mechanics: Rift Wizard and Deskt
 | --- | --- | --- |
 | W-AP-01 | Must | Ships act on action points. A unit without enough points to do something is skipped; no decision is processed for it. |
 | W-AP-02 | Must | Frigates have the most action points. They are fast, and a small crew is responsive. |
+| W-AP-03 | Must | Starting pools, for tuning: a frigate has 10, a cruiser 8, a battleship 6. |
 
 ## Power grid
 
@@ -65,16 +67,30 @@ Tone and craft references, with this game's own mechanics: Rift Wizard and Deskt
 | W-PWR-01 | Must | Subsystems are drives, weapons, shields, sensors, ECM, life support, tactical computers, heat pumps, capacitors and batteries, ammo loaders, powered structural support, and doors and bulkheads. |
 | W-PWR-02 | Must | A ship has multiple generators, distribution nodes spread through the hull, and power lines. Lines can be diverted, damaged, and repaired. |
 | W-PWR-03 | Must | A damaged line can limit the power that reaches a subsystem. A main lane that leaves a generator is the severe case. |
-| W-PWR-04 | Must | Power points may sit unassigned. Putting unassigned power onto a subsystem (a sudden shield boost) is quicker than taking power off a subsystem that is already drawing it, because the engineering crew has to rebalance the grid. |
+| W-PWR-04 | Must | Power points may sit unassigned. Assigning one point of that spare power costs one less action point than re-allocating one point off a subsystem that is already drawing it. The engineering crew has to rebalance the grid for the slower case. |
 
 ## Damage and loss
 
+Component tiers below are the owner's. The earlier ship-scale rules are still theirs too. Where the same word now covers both a component and the whole ship, the spec asks which event is which instead of folding them together.
+
 | ID | Tag | Wish |
 | --- | --- | --- |
-| W-DMG-01 | Must | Repairable damage comes from regular weapons fire and from focused damage. It can disable the ship or force an evacuation. It does not, by itself, end the run. |
-| W-DMG-02 | Must | Dry-dock damage is a massive hole or significant shredding of the chassis. It needs a dry dock, or it writes the ship off. This kind of damage ends the run. |
+| W-DMG-01 | Must | Weapons fire and focused hits damage components. A component is fine-grained enough that a clear purpose is a thing you can refit, except plumbing, which is fixed on the chassis (W-SHP-03). |
+| W-DMG-05 | Must | Crippled is mostly a resource-routing problem, or a minor overheat or surge. |
+| W-DMG-06 | Must | Critical is significant damage that needs no new fabrication. After integrity reaches 0, the component is in a red zone. How deep that zone goes depends on the component's durability and how far it was over-engineered. |
+| W-DMG-07 | Must | Dry dock, on a component, is a hole where the component was, or major parts fused. The component has to be replaced. |
+| W-DMG-02 | Must | A massive hole in the ship, or significant shredding of the chassis, needs a dry dock or writes the ship off. That ship-scale damage ends the run. |
 | W-DMG-03 | Must | Crippling every combat-capable component abandons the ship. |
 | W-DMG-04 | Must | Critical damage to cooling or to the reactor may detonate the ship. |
+| W-DMG-08 | Must | Evacuation is a loss. It pushes the player's in-run progress back. It does not end the run. |
+| W-DMG-09 | Must | Abandonment without an in-game cause ends the run. |
+
+## Interior
+
+| ID | Tag | Wish |
+| --- | --- | --- |
+| W-INT-01 | Must | Repair is a crew action. |
+| W-INT-02 | Must | The player ship, and most vessels immediately proximate to it, each contain a small FTL-like roguelike. Crew move through the interior to repair, and to do the rest of the work that layer is for. |
 
 ## Boarding
 
@@ -112,6 +128,7 @@ Tone and craft references, with this game's own mechanics: Rift Wizard and Deskt
 | --- | --- | --- |
 | W-SHP-01 | Must | Ship builds are highly detailed: many components, chosen and arranged as a build. |
 | W-SHP-02 | Must | Components are synergistic. Combinations change the result beyond the sum of the parts. |
+| W-SHP-03 | Must | Components are fairly fine-grained. Most components with a clear purpose are refittable. Plumbing, pipes and the like, is fixed per chassis. |
 
 ### Proposed
 
@@ -232,4 +249,4 @@ Thrust is the offensive choice and lines up with strike scenarios (W-SCN-01). Ho
 
 ## Where this list stops
 
-Movement, facings, the power grid, damage and loss, boarding, action points, squadron composition and commands, campaign orders, the two factions, Windows and Linux, the memory and turn-time targets, and Rust are decided above. Anything still missing is an open question in [SPEC.md §17](SPEC.md#17-open-questions): action-point amounts, the time cost of a hull turn and of braking, how "quicker" power allocation is measured, how repair is performed, the component catalog, damage thresholds, strike craft and ships of the line, intel, the battle-outcome record, when the ship changes class, captain and crew attributes besides Squad Command, medals, veterans, saves, the holotable, the third animation frame, VRAM, and the boarding map. Proposals in the spec are ways to build the checklist in the meantime. They are not extra wishes.
+Action-point starting values, hull turns, braking, the spare-power discount, crew repair in an interior roguelike, component damage tiers, evacuation, and causeless abandonment are decided above. Anything still missing is an open question in [SPEC.md §17](SPEC.md#17-open-questions). The ones that still block the first playable battle are the base cost of moving a power point, how the interior is played, the interior map and crew count, integrity and red-zone numbers, whether a dry-docked component ends the run, how far evacuation sets progress back, what "abandonment without an in-game cause" includes, and whether power lines are the fixed plumbing. Proposals in the spec are ways to build the checklist in the meantime. They are not extra wishes.
