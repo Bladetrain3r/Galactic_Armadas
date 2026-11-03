@@ -6,11 +6,13 @@ This repository is the design. There is no game code yet.
 
 ## Design pipeline
 
-Read in order. Each document cites the one before it. Entries marked as proposals or open questions were not part of the owner's design.
+Read the pipeline in order. Each document cites the one before it. Tuning defaults are not owner decisions. Proposals are engineering choices.
 
 1. [Wishlist](docs/WISHLIST.md) — everything the game should be, grouped by area and tagged must / should / could, including stretch ideas.
 2. [Checklist](docs/CHECKLIST.md) — testable milestones from a minimal playable battle to the full game.
 3. [Spec](docs/SPEC.md) — systems, data, turn structure, UI, content, and architecture. The language is Rust. The coding guideline (legible, modular, for a reader who does not write much Rust) is in the spec.
+
+[Tuning defaults](docs/TUNING.md) — every unset number and rule, in one table, with the one lore question that is still open.
 
 ## License
 

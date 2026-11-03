@@ -6,9 +6,9 @@ A box is done when a person can perform the test and see the result. Wishlist id
 
 Build order: Milestone 0, then 1 (the first playable battle), 2, 3, 4, 6 (boarding), then 5 (the release). Boarding is part of the full game and is not required to call Milestone 1 playable.
 
-**20,000 ships** is the acceptance stand-in for "tens of thousands" (W-ROL-01, W-TEC-04). A turn of that scene finishes in under a second (W-TEC-07). The count is a planning number. VRAM is still [OQ-22](SPEC.md#17-open-questions).
+**20,000 ships** is tuning default [TD-SCALE](TUNING.md) for "tens of thousands" (W-ROL-01, W-TEC-04). A turn of that scene finishes in under a second (W-TEC-07). VRAM is tuning default [TD-22](TUNING.md). Where a box needs a number the owner has not set, it uses [TUNING.md](TUNING.md).
 
-Where a test needs a rule the owner has not set, the spec offers an unapproved stand-in and names the open question. The test below still describes the outcome the owner already asked for.
+Where a test needs a rule the owner has not set, the box uses the tuning default in [TUNING.md](TUNING.md). The test below is that default.
 
 ## Milestone 0 — Window, grid, scale
 
@@ -34,7 +34,7 @@ The smallest playable battle: one player ship, one hard objective, one turn loop
 - [ ] **C-M1-04** Each turn the player sets the state of each component on their ship, and resolution uses that state. _W-CMB-02, W-SHP-01_
 - [ ] **C-M1-05** Each turn the player routes power among the decided subsystems. The gain and the loss are both visible before the turn resolves. _W-CMB-03, W-PWR-01_
 - [ ] **C-M1-06** With two named components online, a documented synergy changes a result. Turning either component off removes the synergy. _W-SHP-02_
-- [ ] **C-M1-07** The battle ends in success when its hard objective is completed. Evacuation is a loss and the run continues, with in-run progress pushed back. Abandonment without an in-game cause ends the run. How far progress moves, and which abandonments count as causeless, are [OQ-39](SPEC.md#17-open-questions) and [OQ-40](SPEC.md#17-open-questions). _W-SCN-03, W-DMG-08, W-DMG-09_
+- [ ] **C-M1-07** The battle ends in success when its hard objective is completed. Evacuation restarts that battle and keeps the ship, the fit, and the crew. Ordering an abandon while a combat component still works ends the run. _W-SCN-03, W-DMG-08, W-DMG-09_ TD-39, TD-40
 - [ ] **C-M1-08** A full turn — movement, facings, weapons, components, power, a crew repair in the interior, and end turn — can be played with the keyboard alone, and the same turn can be played with the mouse. _W-UI-06, W-UI-07, W-INT-01_
 - [ ] **C-M1-09** During the battle the screen is two sidebars and the central grid, and weapons, components, facings, and power are readable without leaving the battle. _W-UI-01, W-CMB-01, W-CMB-02, W-CMB-03_
 - [ ] **C-M1-10** The player ship has momentum and coasts until it brakes or changes vector. Accelerating spends the whole turn and moves the ship at most 3 hexes. Braking spends the whole turn as well, because it is the same action with the force reversed. _W-MOV-01, W-MOV-02, W-MOV-05_
@@ -43,7 +43,7 @@ The smallest playable battle: one player ship, one hard objective, one turn loop
 - [ ] **C-M1-13** Assigning one point of spare power costs exactly one action point less than taking one point off a subsystem that is already drawing power. _W-PWR-04_
 - [ ] **C-M1-14** The player ship has more than one generator, distribution nodes, and power lines. Diverting a line changes what it feeds. Damaging a main line out of a generator lowers how much power can reach a subsystem. Crew who reach that line through the interior restore the delivery. A control that never sends crew does not. _W-PWR-02, W-PWR-03, W-INT-01_
 - [ ] **C-M1-15** A hit can leave a component crippled: power or another resource routes worse, or the component shows a minor overheat or surge. The run continues. _W-DMG-01, W-DMG-05_
-- [ ] **C-M1-16** Crippling every combat-capable component abandons the ship. Whether that word is the mild crippled tier is [OQ-40](SPEC.md#17-open-questions). _W-DMG-03_
+- [ ] **C-M1-16** When every combat-capable component is at least crippled (the mild tier), the ship is abandoned, the battle is lost, and the run restarts that battle the same way evacuation does. The run does not end. _W-DMG-03_ TD-40
 - [ ] **C-M1-17** A component whose integrity reaches 0 enters the critical red zone and can be brought back without fabricating a new part. Critical damage to cooling or to the reactor can detonate the ship. A component that is only crippled does not detonate it. _W-DMG-04, W-DMG-06_
 - [ ] **C-M1-18** A massive hole in the ship, or a shredded chassis, ends the run. _W-DMG-02_
 - [ ] **C-M1-19** The player can move crew through the player ship's interior. Repair happens because those crew do the work at the damaged place. _W-INT-01, W-INT-02_
@@ -110,7 +110,7 @@ The decided game around the run, and a build someone else can launch.
 - [ ] **C-M5-01** A medal is earned by a stated achievement, names that achievement, and applies a small bonus the player can see. _W-MET-01_
 - [ ] **C-M5-02** A run can include veteran crew by chance. A veteran crew differs from a non-veteran crew on the progression screen. _W-MET-02, W-PRG-03_
 - [ ] **C-M5-03** With ironman on, loss of the player ship ends the run (the escape pod fails). The next run starts from scratch: a new frigate, a new captain, and a new crew. _W-MET-03_
-- [ ] **C-M5-04** The player can change at least one thing about the holotable layout, and the change lasts for the session. Whether it lasts longer is [OQ-20](SPEC.md#17-open-questions). _W-UI-05_
+- [ ] **C-M5-04** The player can toggle faction tint, objective markers, squadron markers, and weapon-direction hints on the holotable. The change lasts for the session and is gone on the next launch. _W-UI-05_ TD-20
 - [ ] **C-M5-05** Every entity type used in a battle has an idle frame and an attack frame, in a sprite/SVG style, and no entity uses more than three frames. _W-ART-01, W-ART-02_
 - [ ] **C-M5-06** A release is a standalone binary, plus only the files beside it that it needs, for Windows and for Linux. It starts with no preinstalled language runtime. _W-TEC-01, W-TEC-03_
 - [ ] **C-M5-07** That release can run the Milestone 0 scale scene and a Milestone 2 battle, and a turn of each finishes in under a second. _W-TEC-03, W-TEC-04, W-TEC-07_

@@ -4,7 +4,7 @@ Stage 1 of 3. [CHECKLIST.md](CHECKLIST.md) turns this list into milestones. [SPE
 
 This file is the owner's design for **Battles of Galactic Armadas**, plus a few stretch ideas. Priority tags are Must / Should / Could. A Must can wait until a later milestone. The tag means the full game includes it.
 
-**Decided** entries are the owner's. **Proposed** entries were added in this planning pass and are not approved. Design gaps are not filled in here; they are [open questions in the spec](SPEC.md#17-open-questions).
+**Decided** entries are the owner's. **Proposed** entries were added in this planning pass and are not approved. Numbers and rules the owner has not set are [tuning defaults](TUNING.md).
 
 ## Pillars
 
@@ -249,4 +249,4 @@ Thrust is the offensive choice and lines up with strike scenarios (W-SCN-01). Ho
 
 ## Where this list stops
 
-Action-point starting values, hull turns, braking, the spare-power discount, crew repair in an interior roguelike, component damage tiers, evacuation, and causeless abandonment are decided above. Anything still missing is an open question in [SPEC.md §17](SPEC.md#17-open-questions). The ones that still block the first playable battle are the base cost of moving a power point, how the interior is played, the interior map and crew count, integrity and red-zone numbers, whether a dry-docked component ends the run, how far evacuation sets progress back, what "abandonment without an in-game cause" includes, and whether power lines are the fixed plumbing. Proposals in the spec are ways to build the checklist in the meantime. They are not extra wishes.
+Action-point starting values, hull turns, braking, the spare-power discount, crew repair in an interior roguelike, component damage tiers, evacuation, and causeless abandonment are decided above. Numbers and rules the owner has not set are tuning defaults in [TUNING.md](TUNING.md). They do not block a build. The one remaining taste question, the real names of the two faction components, is [OWN-01](TUNING.md#owner-only). Proposals in the spec are engineering choices. They are not extra wishes.
