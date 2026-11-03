@@ -57,7 +57,7 @@ Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cp
 cargo run --release
 ```
 
-CMake compiles SDL into the binary. The binary uses the normal Win32 libraries.
+CMake compiles SDL into the binary. The binary uses the normal Win32 libraries. CMake 4 no longer accepts SDL2's old `cmake_minimum_required`; the repo sets `CMAKE_POLICY_VERSION_MINIMUM=3.5` for the build so current CMake still configures it.
 
 Rendering uses the `sdl2` crate rather than SDL3. The spec allows that fallback while the SDL3 bindings are still migrating. The note is in [docs/TUNING.md](docs/TUNING.md).
 
