@@ -3,3 +3,6 @@
 # The bundled SDL2 sources still declare an older minimum. CMake reads this
 # variable from the environment and accepts the project. CMake 3.x ignores it.
 CMAKE_POLICY_VERSION_MINIMUM = "3.5"
+# CMake reads this when a build tree is first created. The file only turns
+# SDL_PIPEWIRE off. It does not set CMAKE_SYSTEM_NAME, so this stays a host build.
+CMAKE_TOOLCHAIN_FILE = { value = "cmake/sdl-no-pipewire.cmake", relative = true }

@@ -20,7 +20,7 @@ use sdl2::render::Canvas;
 use sdl2::video::{Window, WindowBuilder};
 use sdl2::VideoSubsystem;
 
-use crate::camera::{Camera, MAX_ZOOM, MIN_ZOOM, PAN_PX_PER_SEC, ZOOM_STEP};
+use crate::camera::{arrow_pan_direction, Camera, MAX_ZOOM, MIN_ZOOM, PAN_PX_PER_SEC, ZOOM_STEP};
 use crate::hex::{self, Hex};
 use crate::render::{self, FrameInfo, Hud, Layout};
 use crate::sim::{self, Snapshot};
@@ -262,20 +262,12 @@ fn ship_hex(snapshot: &Snapshot, index: usize) -> Hex {
 }
 
 fn pan_from_keys(keys: &sdl2::keyboard::KeyboardState<'_>, camera: &mut Camera, dt: f32) {
-    let mut x: f32 = 0.0;
-    let mut y: f32 = 0.0;
-    if keys.is_scancode_pressed(Scancode::Left) {
-        x -= 1.0;
-    }
-    if keys.is_scancode_pressed(Scancode::Right) {
-        x += 1.0;
-    }
-    if keys.is_scancode_pressed(Scancode::Up) {
-        y -= 1.0;
-    }
-    if keys.is_scancode_pressed(Scancode::Down) {
-        y += 1.0;
-    }
+    let (x, y) = arrow_pan_direction(
+        keys.is_scancode_pressed(Scancode::Left),
+        keys.is_scancode_pressed(Scancode::Right),
+        keys.is_scancode_pressed(Scancode::Up),
+        keys.is_scancode_pressed(Scancode::Down),
+    );
     if x == 0.0 && y == 0.0 {
         return;
     }

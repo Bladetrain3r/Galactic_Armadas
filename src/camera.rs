@@ -59,6 +59,10 @@ impl Camera {
     }
 
     /// Drag the map with the pointer. `dx` and `dy` are screen pixels.
+    ///
+    /// Positive x slides the map to the right, so the camera looks further left.
+    /// Positive y slides the map downward. World y grows down the screen, so
+    /// that looks further up.
     pub fn pan_screen(&mut self, dx: f32, dy: f32) {
         self.center_x -= dx / self.zoom;
         self.center_y -= dy / self.zoom;
@@ -78,6 +82,28 @@ impl Camera {
         self.center_x = x;
         self.center_y = y;
     }
+}
+
+/// Screen-pixel direction for the arrow keys, in the same space as [`Camera::pan_screen`].
+///
+/// The keys name the direction to look. That is the opposite of a drag: Left
+/// looks left (the map slides right), and Up looks up.
+pub fn arrow_pan_direction(left: bool, right: bool, up: bool, down: bool) -> (f32, f32) {
+    let mut x = 0.0;
+    let mut y = 0.0;
+    if left {
+        x += 1.0;
+    }
+    if right {
+        x -= 1.0;
+    }
+    if up {
+        y += 1.0;
+    }
+    if down {
+        y -= 1.0;
+    }
+    (x, y)
 }
 
 #[cfg(test)]
@@ -112,5 +138,32 @@ mod tests {
         let start_x = camera.center_x;
         camera.pan_screen(100.0, 0.0);
         assert!(camera.center_x < start_x);
+    }
+
+    #[test]
+    fn arrow_keys_look_toward_the_named_edge() {
+        let origin = Camera::opening_at(Hex::new(0, 0));
+        let mut camera = Camera::opening_at(Hex::new(0, 0));
+        let (dx, dy) = arrow_pan_direction(true, false, false, false);
+        camera.pan_screen(dx * 80.0, dy * 80.0);
+        // Smaller center x is further left. World y grows down the screen,
+        // so a smaller center y is further up.
+        assert!(camera.center_x < origin.center_x, "left looks left");
+        assert!((camera.center_y - origin.center_y).abs() < 0.01);
+
+        camera = Camera::opening_at(Hex::new(0, 0));
+        let (dx, dy) = arrow_pan_direction(false, true, false, false);
+        camera.pan_screen(dx * 80.0, dy * 80.0);
+        assert!(camera.center_x > origin.center_x, "right looks right");
+
+        camera = Camera::opening_at(Hex::new(0, 0));
+        let (dx, dy) = arrow_pan_direction(false, false, true, false);
+        camera.pan_screen(dx * 80.0, dy * 80.0);
+        assert!(camera.center_y < origin.center_y, "up looks up");
+
+        camera = Camera::opening_at(Hex::new(0, 0));
+        let (dx, dy) = arrow_pan_direction(false, false, false, true);
+        camera.pan_screen(dx * 80.0, dy * 80.0);
+        assert!(camera.center_y > origin.center_y, "down looks down");
     }
 }

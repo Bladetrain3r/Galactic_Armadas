@@ -49,6 +49,8 @@ cargo run --release
 
 The X11 packages are headers and the usual client libraries. A desktop already has the shared libraries; the `-dev` packages are for the build. The finished binary still loads those system X11 libraries at run time. It does not need `libsdl2` installed.
 
+Recent PipeWire headers fail to compile the bundled SDL 2.0 audio backend (`pw_node_enum_params` now takes `struct pw_node *`). The build turns that backend off. PulseAudio and ALSA are unchanged. If a previous attempt already configured SDL, run `cargo clean -p sdl2-sys` once so CMake picks up the change.
+
 ### Windows
 
 Install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) with the Desktop development with C++ workload, and install [CMake](https://cmake.org/download/) (the rustup defaults find MSVC; CMake has to be on `PATH`). Then, in that environment:
