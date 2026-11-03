@@ -9,7 +9,7 @@ Two kinds of text sit in this file, and they stay apart:
 
 Open questions are collected in [§17](#17-open-questions). A milestone can be built while they are open by using the stand-in in that section. Shipping a stand-in as the real rule is an owner decision, not a default.
 
-The implementation language is **not chosen**. [§16](#16-language) compares options and recommends one.
+The implementation language is **Rust**. [§16](#16-language-and-coding-guideline) is the coding guideline: legible, modular Rust for a reader who does not write much Rust.
 
 ## 1. Pillars
 
@@ -18,8 +18,9 @@ _Checklist: the shape of Milestones 1 through 4._
 Decided:
 
 - Turn-based combat-puzzle roguelike. A fight is a setup of the ship, then a result the player can explain.
-- The player is one captain. Their ship is fully managed. A small squadron is sometimes theirs to command. The armada around them is instanced and acts on its own orders.
-- One hard objective per battle. High-value targets destroyed, and intel gathered, improve the overall battle outcome. The outcome is what the war records.
+- The player is one captain. Their ship is fully managed. A squadron is sometimes theirs to command, with the composition and the four orders in [§10](#10-orders-and-the-squadron). The armada around them is instanced and acts on its own orders.
+- Time is turns of action points. Frigates have the most. Ships have momentum, a top speed of 3 hexes a turn, and separate hull and weapon facings.
+- One hard objective per battle. High-value targets destroyed, and intel gathered, improve the overall battle outcome. The outcome is what the war records. An ignored order that nobody else completes has a moderately outsized effect on the campaign.
 - A run is ten battles on a war map. Each step offers thrust (a strike) or hold (a defense) and plays the one the player picks.
 - The ship class goes frigate, then cruiser, then battleship. The captain and the crew progress too.
 
@@ -30,9 +31,12 @@ Decided terms. Where the mechanic is still open, the entry says so.
 | Term | Meaning |
 | --- | --- |
 | Player ship | The one ship whose weapons, components, and power the player sets each turn. |
-| Squadron | A small group of allied ships the player may command in a given battle. Some battles have none. Size and depth of command: [OQ-06](#17-open-questions). |
-| Order | An instruction from outside the player, shown for the battle, which the hard objective agrees with. What it costs to ignore: [OQ-07](#17-open-questions). |
+| Squadron | Allied ships the player may command in a battle. Some battles have none. Composition is by class (W-SQD-01). Commands are focus, hold, protect, and follow. |
+| Squad Command | An improvable skill. A battleship squadron requires it at maximum. |
+| Order | A campaign objective shown for the battle. The hard objective agrees with it. Ignoring it has a moderately outsized campaign effect unless another ship completes it. |
+| Action points | The budget a ship spends on commands in a turn. Frigates have the largest budget. A ship that cannot afford an action is skipped. |
 | Hard objective | The single mission goal of a battle. Completing it ends the battle in success (C-M1-07). |
+| Strategic objective | What one side is trying to do in the battle. Both sides have one. The player's order is their piece of their side's objective, and the link tightens as the campaign goes on. |
 | High-value target | A marked ship or node that is not the hard objective. Destroying it improves the battle outcome. |
 | Intel | Information the player gathers by an action that is not the hard objective. The action: [OQ-08](#17-open-questions). |
 | Battle outcome | The record of the battle that matters. Shown on its own, apart from success or failure of the objective (C-M2-07), and kept on the war map. Shape of the record: [OQ-10](#17-open-questions). |
@@ -40,94 +44,115 @@ Decided terms. Where the mechanic is still open, the entry says so.
 | Hold | The defensive choice on a war-map step. Uses a hold-until-counterattack objective. |
 | Holotable | The central battlefield view: dense tactical icons, in the role of a fleet command table. |
 | Ironman | A mode in which the escape pod fails. Ship loss ends the run, and the next start is from scratch (C-M5-03). |
+| Repairable damage | Harm from regular fire or a focused hit. It can take a component offline, disable the ship, or force an evacuation. The run continues. |
+| Dry-dock damage | A massive hole or shredded chassis. It ends the run. |
+| Imperial Royal Navy | One of the two factions. Its ships are a little tougher. |
+| Allied People's Naval Forces | The other faction. Its ships have slightly more gun. |
 
 ## 3. War and battles
 
-_Checklist: C-M4-01, C-M4-02, C-M4-03, C-M4-04, C-M4-05, C-M4-06, C-M2-07._
+_Checklist: C-M4-01, C-M4-02, C-M4-03, C-M4-04, C-M4-05, C-M4-06, C-M4-07, C-M4-08, C-M2-07, C-M2-11._
 
 Decided flow:
 
 1. The run is a sequence of ten steps on a war map.
 2. Each step offers two battles, one thrust and one hold. The player picks one. The other is not played.
-3. The battle is played to success or failure of its one hard objective, while high-value targets and intel update the outcome.
-4. The outcome is written onto that step of the map, where the player can read it before the next choice.
-5. After the tenth battle, the run ends on a summary of the ten outcomes.
+3. Each battle has a strategic objective for each side. The player's order is linked to their side's objective, and a later battle in the ten links them more tightly than an early one (C-M4-08).
+4. The battle is played to success or failure of its one hard objective, while high-value targets and intel update the outcome.
+5. If the player ignores the order and no other ship completes it, the campaign effect is moderately outsized compared with missing a side target (C-M4-07). Another ship completing it absorbs that effect.
+6. The outcome is written onto that step of the map, where the player can read it before the next choice.
+7. After the tenth battle, the run ends on a summary of the ten outcomes.
 
 > **Proposal P-WAR-MAP (unapproved).** The map is a single column of ten steps. Each step shows two named choices. The unchosen battle leaves no outcome. The map stores, per played step, objective success or failure plus the outcome record from [P-OUT-01](#9-objectives-high-value-targets-intel). A moving front is the separate stretch wish P-WAR-01, checklist C-P-04.
 
-Whether a bad outcome can end the war early, and whether an outcome changes a later battle, are [OQ-10](#17-open-questions) and [OQ-11](#17-open-questions). The stand-in plays all ten steps regardless of results, and later battles do not read earlier numbers. The map still shows them, which is what C-M4-04 tests.
+The campaign already changes when an order is ignored (above). Whether the war can end before ten battles is [OQ-11](#17-open-questions). What else an outcome stores, and whether high-value targets and intel change later battles on top of the order effect, is [OQ-10](#17-open-questions). The stand-in still plays all ten steps, shows the outcome lines on the map, and does not feed those lines into later battle setup except for the decided order effect. How large "moderately outsized" is, and the schedule of the tightening link, are the rest of [OQ-07](#17-open-questions).
 
 ## 4. Turn structure
 
-_Checklist: C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-09._
+_Checklist: C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-09, C-M1-10, C-M1-11, C-M1-12, C-M0-06, C-M2-10._
 
-Decided, and nothing more: time is turns. On the player's turn they set weapon orientations, component states, and power routing for their own ship. Then the turn resolves. Keyboard alone can do this, and the mouse can do it too.
+Decided:
 
-> **Proposal P-TURN-01 (unapproved).** Stand-in for [OQ-05](#17-open-questions).
->
-> 1. **Prepare.** The order and the hard objective are already on screen. The player sets orientation per weapon, on or off per component, and a power allocation. They commit.
-> 2. **Resolve.** Every ship that acts this turn acts from the state at the start of the resolve, so there is no initiative stat. Player weapons fire along their orientations if they are online and powered. Squadron and armada ships carry out their own orders. Damage is applied. Objective, high-value target, and intel flags update.
-> 3. **Report.** The outcome readout changes to match those flags.
->
-> Movement is not part of this stand-in. If [OQ-01](#17-open-questions) adds movement, it becomes a Prepare choice and a resolve substep before weapons fire.
->
-> The battle ends after the report in which the hard objective is complete, or in which the player ship's hull reaches zero ([P-DMG-01](#6-ships-and-components)).
+- Time is turns. Each ship has an action-point pool. Frigates have the largest pool, because they are fast and a small crew answers quickly.
+- A ship that does not have the points to do anything is skipped. The simulation does not process a decision for it.
+- The player spends points on commands for their own ship: acceleration and other vector changes, hull facing, weapon facings, component state, and power. The crew carries the commands out. Movement draws on the same pool as the other commands.
+- Acceleration is a full-turn action. That ship takes no other command while it accelerates. It moves at most 3 hexes that turn.
+- Ships have momentum. They keep their vector until they brake or change it. Turning the hull takes time.
+- Keyboard alone can play the turn, and the mouse can play the same turn.
 
-A sample of Prepare, used by C-M1-06, is in [§6](#6-ships-and-components). It is sample content.
+The size of each class's pool, and how many points a hull turn or a brake costs, are [OQ-25](#17-open-questions) and [OQ-26](#17-open-questions).
+
+> **Proposal P-TURN-01 (unapproved).** Stand-in for who acts before whom ([OQ-27](#17-open-questions)).
+>
+> 1. **Prepare.** The order, the hard objective, and both sides' strategic objectives are on screen. The player spends action points. They commit.
+> 2. **Resolve.** Ships that still have a legal command act in this order: the player ship, then squadron ships, then every other ship with enough points. Each acts on the latest state. Acceleration resolves as that ship's entire action. Weapons fire along their own facings when those weapons are online and powered. Damage, objectives, high-value targets, and intel update.
+> 3. **Report.** The outcome readout matches those flags.
+>
+> Sample pools until OQ-25 is answered: frigate 6, cruiser 4, battleship 3. Sample costs until OQ-26 is answered: one point to turn the hull one hex side, and braking is a full-turn action like acceleration. These numbers are not approved.
+
+A sample of a component synergy, used by C-M1-06, is in [§6](#6-ships-and-components). It is sample content.
 
 ## 5. Battlefield and scale
 
-_Checklist: C-M0-02, C-M0-03, C-M0-04, C-M0-06, C-M0-07, C-M2-01, C-M2-08._
+_Checklist: C-M0-02, C-M0-03, C-M0-04, C-M0-06, C-M0-07, C-M2-01, C-M2-08, C-M2-09, C-M1-10._
 
 Decided:
 
 - Hex grid. Camera opens moderately zoomed in, pans freely, zooms freely.
 - Navigation can bring the view to the player ship and to the hard objective without traversing the grid by hand (C-M0-04).
 - At that opening zoom the player sees many ships, as icons.
-- A battle instances at least 20,000 ships. That count is the planning stand-in for "tens of thousands".
-- The window keeps accepting input and drawing while those ships advance. No single lock is held around the whole update.
+- A battle instances at least 20,000 ships. That count is the planning stand-in for "tens of thousands". Processing a turn of that scene takes under a second on 4 cores and 8 GB with nothing else running (W-TEC-07). The official minimum memory is 16 GB.
+- The window keeps accepting input and drawing while those ships advance. No single lock is held around the whole update. Ships without the action points to act are not given a decision.
+- Hull facing and weapon facings are separate. A ship the player is not close to may use a cheap facing approximation or a batched update. The fiction is sensor falloff: the computers spend their time on what is close (C-M2-09).
 - The player commands only their ship and, when present, their squadron.
+- Movement: momentum, coasting until brake or vector change, acceleration as a full-turn action, at most 3 hexes in a turn ([§4](#4-turn-structure)).
 
 > **Proposal P-HEX-01 (unapproved).** Axial hex coordinates `(q, r)`. Neighbors are the six axial directions, numbered 0–5, which weapon orientation reuses. Distance is cube distance.
 
-> **Proposal P-SIM-01 (unapproved).** Stand-in for [OQ-17](#17-open-questions) and the scale boxes.
+> **Proposal P-SIM-01 (unapproved).** Stand-in for the part of [OQ-17](#17-open-questions) the owner has not closed. Distance approximations for facing, and skipping ships with no action points, are already decided. This proposal only covers the rest.
 >
-> Every ship is an instance with an id, a faction, a hex, a hull, and an order it is following. Fidelity then splits:
+> Every ship is an instance with an id, a faction, a hex, a velocity, a hull facing, and an order. Fidelity then splits:
 >
-> - **Player ship.** Full components, power, and per-weapon orientation.
-> - **Squadron.** Order plus a reduced combat stat. Full micromanagement is [OQ-06](#17-open-questions), and the stand-in does not require it to finish a battle.
-> - **Armada.** Order, hull, faction, hex, and one volley stat. They do not run the player's component puzzle.
+> - **Player ship.** Full components, the power grid, and a facing per weapon.
+> - **Squadron.** The four commands, plus a reduced combat stat. The player does not set their components. Strike craft are one instance per wing, with a craft count ([P-WING-01](#10-orders-and-the-squadron)).
+> - **Armada, far from the player.** Order, faction, hex, velocity, one approximate facing, and one volley stat. They do not run the power grid.
 >
-> Armada updates run in parallel over spatial chunks of the grid. A chunk writes a private buffer. A following pass applies ships on chunk borders. Workers never lock a ship, and they never call SDL. One task per ship is the failure mode this proposal is here to avoid.
+> Updates of the far armada run in parallel over spatial chunks. A chunk writes a private buffer. A following pass applies ships on chunk borders. Workers never lock a ship, and they never call SDL. One task per ship is the failure this proposal is here to avoid.
 >
-> The machine and the allowed turn time for the 20,000-ship scene are [OQ-22](#17-open-questions). Until that is set, C-M0-06 and C-M2-01 pass if the camera can be panned during the update and the window does not freeze through it.
+> VRAM is [OQ-22](#17-open-questions). C-M0-06 and C-M2-01 pass when a turn finishes in under a second on 4 cores and 8 GB and the camera can pan during the update.
 
 > **Proposal P-SIM-02 (unapproved).** At the end of a resolve, the simulation publishes an immutable snapshot and keeps working on the other buffer. The render thread reads only the snapshot.
 
 ## 6. Ships and components
 
-_Checklist: C-M1-04, C-M1-06, C-M3-01, C-M3-02, C-M3-06._
+_Checklist: C-M1-04, C-M1-06, C-M1-07, C-M1-15, C-M1-16, C-M1-17, C-M1-18, C-M3-01, C-M3-02, C-M3-06._
 
 Decided:
 
 - A build is a set of individual components on a hull. The player sets each component's state on their turn.
 - Two components can form a synergy: both online, the result changes; either off, the change disappears.
-- Frigate, cruiser, and battleship differ in how much build they can hold (component capacity or power).
-- A ship-management subscreen exists for the build (W-UI-02). What it changes beyond the in-battle component controls is [OQ-24](#17-open-questions).
+- Frigate, cruiser, and battleship differ in how much build they can hold.
+- A ship-management subscreen exists for the build (W-UI-02). What it changes beyond the in-battle controls is [OQ-24](#17-open-questions).
+- Damage has two kinds, in the spirit of Nexus: The Jupiter Incident. **Repairable** damage is regular fire or a focused hit. It can take a component offline, disable the ship, or force an evacuation, and the run goes on. **Dry-dock** damage is a massive hole or shredded chassis, and it ends the run (C-M1-18).
+- Crippling every combat-capable component abandons the ship (C-M1-16).
+- Critical damage to cooling or to the reactor may detonate the ship (C-M1-17).
+- The battle fails when the player ship is abandoned, evacuated, detonated, or disabled (C-M1-07).
 
-> **Proposal P-DMG-01 (unapproved).** Stand-in for [OQ-04](#17-open-questions), and the meaning of "lost" in C-M1-07. Each ship has integer hull. At zero the ship is lost and the battle ends in failure. Weapons reduce hull. Components have two states, online and offline. Per-component damage waits on the owner.
+The component catalog, and the amounts that count as crippled, critical, or dry-dock, are [OQ-04](#17-open-questions). Whether evacuation and abandonment are the same event is [OQ-33](#17-open-questions).
 
-> **Proposal P-FIT-01 (unapproved).** Sample class budgets, so C-M3-01 has something to load. Not tuned.
+> **Proposal P-DMG-01 (unapproved).** Data-shape stand-in, not a damage curve. A component is sound or crippled. A hit is tagged `repairable` or `dry_dock`. Cooling and the reactor are subsystems; crippling either is the critical case that may detonate. The integer-hull model from the first draft is retired. Sample content may mark one weapon as dealing repairable damage and one as dealing dry-dock damage so C-M1-15 and C-M1-18 have a button to press.
+
+> **Proposal P-FIT-01 (unapproved).** Sample slot counts, so C-M3-01 has something to load. Power comes from generators ([§7](#7-power)), not from a single class budget. Not tuned.
 >
-> | Class | Component slots | Power budget |
+> | Class | Component slots | Generators |
 > | --- | --- | --- |
-> | Frigate | 4 | 6 |
-> | Cruiser | 7 | 10 |
-> | Battleship | 10 | 14 |
+> | Frigate | 4 | 2 |
+> | Cruiser | 7 | 3 |
+> | Battleship | 10 | 4 |
 >
 > The frigate's starting fit holds one of the two synergy parts in the sample below. The cruiser's slot count holds both. That is the C-M3-06 test. When the class actually changes is [OQ-12](#17-open-questions). The stand-in offers the cruiser refit after the third battle is resolved and the battleship refit after the seventh, as a hull change on the ship-management screen. Any other trigger replaces this.
 >
-> Stand-in for [OQ-24](#17-open-questions) and C-M3-02: between battles the ship-management subscreen fits and unfits components. During a battle the sidebar only toggles components that are already fitted.
+> Stand-in for [OQ-24](#17-open-questions) and C-M3-02: between battles the ship-management subscreen fits and unfits components. Dry-dock damage is not repaired there. During a battle the sidebar toggles components that are already fitted and issues the field repair in [P-REP-01](#7-power).
 
 > **Proposal P-SYNERGY-01 (unapproved).** Sample content for C-M1-06. The real component list is [OQ-04](#17-open-questions), together with damage.
 >
@@ -138,21 +163,31 @@ Decided:
 
 ## 7. Power
 
-_Checklist: C-M1-05, C-M1-09._
+_Checklist: C-M1-05, C-M1-09, C-M1-13, C-M1-14._
 
-Decided: each turn the player routes a limited supply of power between subsystems. Giving power to one subsystem takes it from another, and both effects are visible before the turn commits.
+Decided:
 
-> **Proposal P-POW-01 (unapproved).** Stand-in for [OQ-03](#17-open-questions). Four sample subsystems: drives, weapons, shields, sensors. The player assigns every point of the class budget; the sum equals the budget. A weapon resolves only if its component is online and the weapons allocation covers that weapon's cost. The C-M1-05 demonstration moves one point from sensors to weapons: the sensor readout falls, the weapon readout rises, both before commit. Drives have no movement effect until [OQ-01](#17-open-questions) says the ship changes hexes. Shields have no effect beyond a visible readout until [OQ-04](#17-open-questions) defines damage beyond hull.
+- The subsystems are drives, weapons, shields, sensors, ECM, life support, tactical computers, heat pumps, capacitors and batteries, ammo loaders, powered structural support, and doors and bulkheads.
+- A ship has multiple generators, distribution nodes through the hull, and power lines between them.
+- A line can be diverted, damaged, and repaired. A damaged line can cap how much power reaches what it feeds. A main lane leaving a generator is the case C-M1-14 tests.
+- Points may sit unassigned. Assigning unassigned power (the shield-boost case) is quicker than pulling power off a subsystem that is already drawing it, because the engineering crew rebalances the grid.
+- Both the gain and the loss are visible before the player commits.
+
+What "quicker" is measured in is [OQ-28](#17-open-questions). How the player repairs a line or a repairable component, and what it costs, is [OQ-29](#17-open-questions).
+
+> **Proposal P-POW-01 (unapproved).** Sample grid for one frigate, so the boxes have a layout. Two generators. Each feeds a distribution node through a main lane. Nodes feed the subsystems through branch lines. A weapon fires only if it is sound, online, and its branch can carry its cost. Diverting a branch swaps which subsystem it feeds.
+>
+> **Proposal P-REP-01 (unapproved).** Stand-in for OQ-29. A repair command on a repairable crippled component or line spends one action point and clears that cripple. Dry-dock damage has no field repair.
 
 ## 8. Weapons
 
-_Checklist: C-M1-03._
+_Checklist: C-M1-03, C-M1-11, C-M2-09._
 
-Decided: each weapon has an orientation the player sets each turn. The shot resolves along that orientation.
+Decided: the hull has a facing, and each weapon has its own facing. The player sets weapon facings on their turn. A shot resolves along that weapon's facing. Turning the hull takes time and does not drag the weapon facings with it. Ships far from the player may show a cheap approximation instead of every facing.
 
-> **Proposal P-WPN-01 (unapproved).** Stand-in for [OQ-02](#17-open-questions). Orientation is an absolute hex direction, 0–5, from [P-HEX-01](#5-battlefield-and-scale). The weapon affects targets along that ray out to a per-weapon range. There is no separate hull facing in the stand-in. If the owner adds facing, orientation becomes relative to it and this proposal is retired.
+> **Proposal P-WPN-01 (unapproved).** Each facing is a hex direction 0–5 from [P-HEX-01](#5-battlefield-and-scale), stored separately for the hull and for each weapon. A weapon affects targets along its ray out to a per-weapon range. Range and arcs are content. "Close" for C-M2-09 means within 8 hexes of the player ship until a real sensor range exists. That radius is not approved.
 
-Legend of Galactic Heroes and the Honorverse set the tone of fleet warfare (W-FAN-02). They do not supply the weapon rules. Missiles, wedges, broadsides, and spinal mounts are all available later as content on top of orientation-plus-range. None of them is decided.
+Legend of Galactic Heroes and the Honorverse set the tone of fleet warfare (W-FAN-02). Weapon rules are the facings above, plus whatever components the catalog in [OQ-04](#17-open-questions) adds. Missiles, wedges, broadsides, and spinal mounts can be content on top of a facing and a range. None of those mounts is decided.
 
 ## 9. Objectives, high-value targets, intel
 
@@ -160,7 +195,7 @@ _Checklist: C-M1-01, C-M1-02, C-M1-07, C-M2-02, C-M2-03, C-M2-04, C-M2-05, C-M2-
 
 Decided:
 
-- One hard objective. Success is completing it. The battle also ends in failure if the player ship is lost; the stand-in for "lost" is [P-DMG-01](#6-ships-and-components).
+- One hard objective. Success is completing it. The battle ends in failure when the player ship is abandoned, evacuated, detonated, or disabled ([§6](#6-ships-and-components)).
 - Strike objectives name a command ship, a communication node, or another designated target, and the target is marked.
 - Hold objectives ask the player ship to survive until a counterattack the player can see.
 - A marked high-value target is not the hard objective. Destroying it improves the outcome.
@@ -171,7 +206,7 @@ Decided:
 >
 > The outcome record of a battle is three visible lines: objective (done or failed), high-value targets destroyed out of those present, intel gathered out of the intel actions present. The map and the end-of-run summary show those lines as themselves.
 >
-> Sample strike content: objective type `destroy` aimed at a flagged entity; two other entities tagged `hvt`. Sample hold content: objective type `survive_until_counterattack`; on a scripted turn, allied ships arrive at a stated map edge and the objective completes if the player ship still has hull.
+> Sample strike content: objective type `destroy` aimed at a flagged entity; two other entities tagged `hvt`. Sample hold content: objective type `survive_until_counterattack`; on a scripted turn, allied ships arrive at a stated map edge and the objective completes if the player ship has not been lost.
 >
 > Sample intel action: a marked contact can be scanned instead of fired on. Scanning sets that contact's intel flag. Destroying it does not.
 >
@@ -179,46 +214,84 @@ Decided:
 
 ## 10. Orders and the squadron
 
-_Checklist: C-M1-02, C-M2-06, C-M2-08._
+_Checklist: C-M1-02, C-M2-06, C-M2-08, C-M2-11, C-M3-07, C-M3-08, C-M4-07, C-M4-08._
 
 Decided:
 
 - An order the player did not write is on screen, and the hard objective matches it.
-- Some battles attach a small squadron. The player can issue a command that changes what those ships do.
+- The order is a key objective for the campaign. The running example is to strike a cruiser formation so it cannot reinforce a flank elsewhere.
+- If the player ignores it and no other ship completes it, the campaign effect is moderately outsized. Another ship completing it absorbs that effect (C-M4-07).
+- Each battle has a strategic objective for both sides. The player's order is linked to their side's objective, more tightly in a later battle than in an early one (C-M2-11, C-M4-08).
 - Some battles attach no squadron.
-- Ships outside the player ship and the squadron still act, and the player has no command over them.
+- When they do, composition follows the player's class:
+  - **Frigate:** the frigate as C2, 2 to 4 escorts, and optionally 8 strike craft in 2 wings.
+  - **Cruiser:** 1 to 2 cruisers, 2 to 4 frigates, and 16 strike craft in 4 wings.
+  - **Battleship:** 1 flagship, 2 ships of the line, 8 supporting cruisers or frigates, and 16 to 32 strike craft. Available only when Squad Command is at its maximum.
+- The commands are focus (one or more targets, to fire on or to capture), hold (the area around a position), protect (one or more targets), and follow (keep formation on the player's ship).
+- Ships outside the player ship and the squadron still act on their own orders.
+- Squadron control is the four commands above.
 
-> **Proposal P-SQD-01 (unapproved).** Stand-in for [OQ-06](#17-open-questions) and [OQ-07](#17-open-questions).
+How large the outsized effect is, and the steps by which the strategic link tightens, are [OQ-07](#17-open-questions). What a ship of the line is, and whether a strike craft is its own ship, are [OQ-06](#17-open-questions). Whether "focus to capture" is what starts a boarding action is part of [OQ-31](#17-open-questions).
+
+> **Proposal P-WING-01 (unapproved).** A wing is one instance with a craft count and one approximate facing. The frigate's two wings hold 4 craft each. The cruiser's four wings hold 4 each. A battleship wing count follows the 16 to 32 total. Individual craft are not simulated until OQ-06 says to.
 >
-> An order is data on the battle: a sentence and the objective id it belongs to. The stand-in does not punish ignoring it, because the objective is the same instruction stated as a win condition. A harsher order system replaces this when OQ-07 is answered.
->
-> A squadron battle attaches three allied ships. The player gives them one command, `focus` (a target) or `hold` (a hex). They pursue that command with the reduced stat block from [P-SIM-01](#5-battlefield-and-scale). The player does not set their components or power. Three is a stand-in for "small". Doctrines richer than focus and hold are the stretch wish P-ROL-01 (C-P-01).
+> **Proposal P-SKL-01 (unapproved).** Stand-in for [OQ-30](#17-open-questions). Squad Command is an integer 0 to 3. Maximum is 3. The sample raises it by one when a battle ends with the squadron's order carried out. Frigate and cruiser squadrons have no skill gate in this stand-in, because none was stated.
 
 ## 11. Progression and meta
 
-_Checklist: C-M3-01, C-M3-03, C-M3-04, C-M3-05, C-M3-06, C-M5-01, C-M5-02, C-M5-03._
+_Checklist: C-M3-01, C-M3-03, C-M3-04, C-M3-05, C-M3-06, C-M3-07, C-M5-01, C-M5-02, C-M5-03._
 
 Decided:
 
 - Class order is frigate, then cruiser, then battleship, with a real difference in the build ([P-FIT-01](#6-ships-and-components) until real numbers exist).
-- Captain and crew are persistent across the battles of a run, and a battle can change a visible value on each.
-- The progression subscreen shows class, captain, crew, and the latest change.
+- Squad Command is an improvable skill on the captain. At its maximum the player can command a battleship squadron. Below that, they cannot (C-M3-07). The level cap and what raises the skill are [OQ-30](#17-open-questions).
+- Captain and crew are persistent across the battles of a run, and a battle can change a visible value on each. Attributes besides Squad Command are [OQ-13](#17-open-questions).
+- The progression subscreen shows class, captain, crew, Squad Command, and the latest change.
 - A medal names an achievement and grants a small visible bonus.
 - Veteran crew can appear by chance, and the progression screen shows the difference.
 - Ironman: the escape pod fails. The next run starts from scratch (C-M5-03).
 
-> **Proposal P-PRG-01 (unapproved).** Stand-in for [OQ-13](#17-open-questions).
+> **Proposal P-PRG-01 (unapproved).** Stand-in for the attributes [OQ-13](#17-open-questions) has not named. Squad Command is decided and is not part of this guess.
 >
-> - Captain: `name`, `citations`. `citations` increments by one when a battle ends with the hard objective complete.
+> - Captain: `name`, `citations`, `squad_command`. `citations` increments by one when a battle ends with the hard objective complete.
 > - Crew: `experience`, `veteran`. `experience` increments by one when a battle ends with the player ship alive.
 >
-> The progression screen shows the old and new numbers. Further attributes wait on OQ-13.
+> The progression screen shows the old and new numbers.
 
 > **Proposal P-VET-01 (unapproved).** Stand-in for [OQ-14](#17-open-questions). At run start, the crew becomes veteran with probability 1/10 and starts with `experience` 2 instead of 0. The progression screen shows the flag and the number. The probability is a sample constant.
 
-> **Proposal P-MEDAL-01 (unapproved).** Stand-in for [OQ-15](#17-open-questions). One sample medal, `First blood`: destroy any high-value target. Bonus: +1 power budget on the next battle only. The medal's name and the budget change are both on screen. Medals in the stand-in live inside the run. A failed ironman run discards them with the captain, the crew, and the ship. Cross-run medals stay in OQ-15.
+> **Proposal P-MEDAL-01 (unapproved).** Stand-in for [OQ-15](#17-open-questions). One sample medal, `First blood`: destroy any high-value target. Bonus: one extra unassigned power point on the next battle only. The medal's name and the extra point are both on screen. Medals in the stand-in live inside the run. A failed ironman run discards them with the captain, the crew, and the ship. Cross-run medals stay in OQ-15.
 
 Class-change timing stays the [P-FIT-01](#6-ships-and-components) stand-in until [OQ-12](#17-open-questions).
+
+## Factions
+
+_Checklist: C-M2-12, C-M3-09._
+
+Decided:
+
+- The factions are the Imperial Royal Navy and the Allied People's Naval Forces.
+- The difference is mostly lore and cosmetics.
+- Imperial ships are a little tougher. Alliance ships have slightly more gun.
+- Each side has one or two special components. A player on the other side has to capture them to fit them (C-M3-09).
+
+The names of those components are [OQ-32](#17-open-questions).
+
+> **Proposal P-FCT-01 (unapproved).** Sample pieces so C-M3-09 can load. Imperial `belt_plate` adds toughness. Alliance `rapid_mount` adds gun. Capturing one adds it to the ship-management screen. The names are disposable.
+
+## Boarding
+
+_Checklist: C-M6-01, C-M6-02, C-M6-03._
+
+Decided. This is not required for the first playable battle.
+
+- A boarding action is a roguelike played inside the battle. A play runs about 5 to 10 minutes (C-M6-01).
+- The boarders must take the bridge and engineering in time. Missing either one auto-destructs the ship (C-M6-02).
+- The player uses a separate, simpler equipment system. The player's crew and the defenders use standard gear (C-M6-03).
+
+How a boarding starts, what "in time" is in turns or seconds, the map, and the gear list are [OQ-31](#17-open-questions). Focus-to-capture may be the start; that link is not decided.
+
+> **Proposal P-BRD-01 (unapproved).** Stand-in for OQ-31. Ordering focus-to-capture on a ship with every combat component already crippled starts the boarding. The clock is 8 battle-turns, inside the 5 to 10 minute play. The map is a line of rooms with the bridge at one end and engineering at the other. Standard gear is a sidearm and a cutter. The player's kit is those plus one chosen tool. None of this layout is approved.
 
 ## 12. UI and controls
 
@@ -252,9 +325,13 @@ Decided layout: a central battlefield with a sidebar on each side. Ship manageme
 > | Zoom | `-` / `=` | Wheel |
 > | Own ship / objective | `Home` / `End` | Buttons on the left sidebar |
 > | Cycle weapons | Tab | Click the weapon row |
-> | Rotate orientation | `,` / `.` | Click a direction pip on the row |
+> | Rotate weapon facing | `,` / `.` | Click a direction pip on the weapon row |
+> | Rotate hull | `<` / `>` | Click a direction pip on the hull |
+> | Accelerate / brake | `W` / `S` | Buttons on the right sidebar |
 > | Toggle component | Shortcut shown on the row | Click the row |
+> | Repair selected line or component | `R` | Repair button |
 > | Move one power point | `[` / `]` on the selected subsystem | `+` / `−` on the subsystem |
+> | Squadron command | `1`–`4` for focus, hold, protect, follow | Command buttons on the left sidebar |
 > | End turn | Enter | End-turn button |
 > | Ship screen / progression / back | `F1` / `F2` / Esc | Matching buttons |
 
@@ -272,7 +349,7 @@ _Checklist: C-M2-02, C-M2-03, C-M4-02, C-M4-05, and any box that loads a battle.
 
 The owner did not choose a file format. This section is entirely a proposal.
 
-> **Proposal P-DAT-01 (unapproved).** Author content as TOML, because it is language-neutral and readable in reviews. A native format may replace it after [§16](#16-language) is decided. Loading a pack with no code change is the stretch wish P-SHP-01 (C-P-03). The stand-in only requires the game to load its own data files.
+> **Proposal P-DAT-01 (unapproved).** Author content as TOML, because it stays readable in review. A Rust-native format may replace it later. Loading a pack with no code change is the stretch wish P-SHP-01 (C-P-03). The stand-in only requires the game to load its own data files.
 >
 > Sample only:
 >
@@ -297,9 +374,17 @@ The owner did not choose a file format. This section is entirely a proposal.
 
 ## 15. Architecture
 
-_Checklist: C-M0-01, C-M0-06, C-M2-01, C-M5-06, C-M5-07._
+_Checklist: C-M0-01, C-M0-06, C-M0-08, C-M0-09, C-M2-01, C-M5-06, C-M5-07, C-M5-08._
 
-Decided constraints: a standalone process, SDL for portable 2D, standalone binaries for more than one platform, native concurrency, heavily instanced battles, no lock held across a whole update.
+Decided constraints:
+
+- A standalone process, SDL for portable 2D, native concurrency, heavily instanced battles, no lock held across a whole update.
+- Binaries for Windows and Linux. No preinstalled language runtime.
+- A turn of the 20,000-ship scene finishes in under a second. The low target, with no other workload, is 4 cores and 8 GB. The official minimum is 16 GB (C-M5-08).
+- The same scene can run in a container capped at 4 cores and 8 GB (C-M0-09).
+- Code follows the [coding guideline](#16-language-and-coding-guideline).
+
+How much of the work moves to the GPU, and therefore how much VRAM is required, is [OQ-22](#17-open-questions).
 
 > **Proposal P-ARC-01 (unapproved).** Three areas, talking through data rather than shared objects.
 >
@@ -318,81 +403,74 @@ Decided constraints: a standalone process, SDL for portable 2D, standalone binar
 
 Save and reload are [OQ-16](#17-open-questions). The stand-in keeps the run in memory. Ironman still ends the run on ship loss because the in-memory run is discarded.
 
-## 16. Language
+## 16. Language and coding guideline
 
-_Checklist: W-TEC-05, and the binary and scale boxes C-M0-06, C-M5-06, C-M5-07._
+_Checklist: C-M0-08, C-M5-06, W-TEC-05._
 
-**Decision status: open.** The recommendation at the end is [P-LANG-01](#recommendation), unapproved. The owner chooses, including a language this section sells short.
+Decided. The game is written in Rust.
 
-### What the language has to do
+This is the project coding guideline, in the owner's words: keep it legible and modular for someone who does not write much Rust, and avoid over-verbosity.
 
-From the decided tech wishes:
+What that means in this codebase:
 
-1. Compile to standalone binaries for more than one platform, with no preinstalled language runtime.
-2. Call SDL for 2D, from a main thread, while other threads exist.
-3. Update a huge number of ship instances (acceptance bar: 20,000, with headroom past that) without a lock around the world and without one task per ship.
-4. Carry a rules-heavy, content-driven game: components, synergies, scenarios, a war map.
+- Split modules by system: movement, action points, weapons, the power grid, damage, squadron orders, boarding, the war map, and rendering. A reader can open one of those and follow it.
+- Prefer plain functions, concrete structs, and straight control flow. Reach for a trait, a generic, or a macro when it removes a real repetition, not as the default shape of a feature.
+- Name things for the game (a power line, a wing, a facing), not for the pattern they implement.
+- Keep the simulation as tables of ship data, as in [§15](#15-architecture), so the hot path stays a loop a new Rust reader can trace. The type system should make "a worker does not touch SDL" obvious. It should not make a component rule hard to read.
+- Comments say why a rule exists. They do not restate the code, and they do not grow into a second spec.
 
-[OQ-19](#17-open-questions) is the platform list. The comparison assumes desktop Windows, Linux, and macOS, which is [P-PLAT-01](#recommendation) and equally unapproved.
+SDL3 is the rendering target. If the SDL3 bindings block Milestone 0, start on the mature SDL2 crate and move once they do not. That fallback is a schedule note, not a second language.
 
-### Comparison
-
-| | Standalone binary | SDL fit | Concurrency that stays out of lock webs | Huge ship counts | Writing the puzzle rules |
-| --- | --- | --- | --- | --- | --- |
-| **C# with NativeAOT**, SDL3 bindings | NativeAOT publishes a per-platform binary and does not need a desktop runtime installed. Trimming and AOT warnings are the tax. SDL bindings exist; they need an early spike because callbacks and trimming meet here. | Real bindings. The risky part is NativeAOT, not 2D itself. | `async/await` is a poor fit for a 20,000-ship tick. A `Task` per ship is the madness to avoid. `Parallel.For` over spans is the version of P-ARC-01 that C# can do well. A garbage collector still shares the process. | Strong if the sim is structs and arrays from the first week. Weak if ships become objects. | The best of the set. Fast iteration on rules, UI text, and content tools. |
-| **Go**, SDL via cgo | Single static binary is routine. | cgo is required. SDL wants the main thread for the window; the Go runtime wants to move goroutines between OS threads. That fight is the known pain of Go plus SDL, and it sits on the critical path of C-M0-01 and C-M0-06. | Goroutines and channels are the clearest syntax here for "native async", and they match a command buffer well. | The collector is good and still has to scan a large live set every turn unless the sim is slices of plain values with almost no pointers. | Fine for rules. The game ecosystem is thin. Cross-compiling with cgo means a C toolchain per target. |
-| **Rust**, SDL3 (SDL2 crate as fallback) | Standalone binaries, static where the platform allows. | The `sdl2` crate is mature. SDL3 bindings are younger. Fallback: start on SDL2 if SDL3 bindings block Milestone 0, and move once they are not the risk. | Ownership makes P-ARC-01 a type error when someone passes the SDL window to a worker. Chunk updates (Rayon or a small scoped thread pool) match P-SIM-01. Channels or a pair of buffers carry the snapshot and the commands. | No garbage collector. Packed arrays are the ordinary way to write this. Best headroom of the set past 20,000 full instances. | Slower iteration. The borrow checker taxes UI and any web of game-state references. The architecture in §15 avoids most of that tax by keeping the sim as tables. |
-| **Zig** | Small standalone binaries, direct C interop, so SDL is a natural call. | Strong. | Threads exist. The no-lock rule is a convention the team holds, not a check the compiler makes. Async is not a reason to pick Zig. | As good as Rust if the arrays are written that way. Manual memory, explicit allocators. | Pleasant C-like code for rules. Smaller library ecosystem. Language change is still something to watch. |
-| **Odin** | Standalone binaries. Designed for this kind of game. SDL bindings ship with the language vendor collection. | Strong, and used by shipped games. | Same as Zig: capable, conventional rather than enforced. | Data-oriented by habit, which is what the ship tables want. | The most game-shaped language on the list. Smaller ecosystem than Rust or C#. |
-
-C++ with SDL3 is the shortest path to a window and the easiest path back to a lock per entity. It can implement P-ARC-01. It does not help the team keep it. Not recommended as the default.
-
-### Recommendation
-
-<a id="recommendation"></a>
-
-> **Proposal P-LANG-01 (unapproved). Recommend Rust. The owner decides.**
->
-> The constraint that will actually hurt is instancing a battle of tens of thousands of ships, in parallel, next to an SDL main thread, without a nest of locks. Rust matches that constraint directly: packed ship tables, a scoped parallel update, a snapshot to the renderer, and a type system that refuses to hand SDL to a worker. Standalone multi-platform binaries are routine.
->
-> The honest cost is iteration speed on the puzzle rules. If, once Milestone 1 is under way, that cost dominates the simulation problem, the better switch is **C# with NativeAOT**, keeping the same architecture: struct arrays, `Parallel.For` over chunks, no `Task` per ship, SDL only on the main thread. Take that path at the start instead if the owner already knows they want the faster rules language and accepts a disciplined sim. Prove either choice with the Milestone 0 scale scene before writing the war.
->
-> Go is the best reading of the words "native async", and the worst reading of "SDL on the main thread plus a huge live simulation". Pick it only after a prototype shows cgo and the collector are comfortable at 20,000 ships.
->
-> Zig or Odin are credible if the owner wants game-shaped or C-shaped code and will hold the snapshot rule by review. They do not beat Rust at making that rule structural. Prefer Odin over Zig if the reason is the game, and Zig over Odin if the reason is C interop and a tiny runtime.
-
-> **Proposal P-PLAT-01 (unapproved).** Aim the binaries at Windows, Linux, and macOS. Mobile is out of this proposal. [OQ-19](#17-open-questions) confirms or replaces the list. C-M5-06 passes with any two of them.
+Windows and Linux are the shipped platforms (W-TEC-03). The earlier comparison against C#, Go, Zig, and Odin is closed by this decision.
 
 ## 17. Open questions
 
-Each of these is a gap in the owner's design. The stand-in next to it is a way to keep building, not an answer. Closing one means editing the decided column of the relevant section and retiring or adopting the proposal.
+Answered questions are listed under [Closed](#closed-questions). What remains is a gap. A stand-in next to a row is a way to keep building. It is not an answer.
 
-| ID | Question | Stand-in until answered | Boxes it touches |
+Ordered here by what they block. The first playable battle is Milestone 1. Later rows block a later milestone. VRAM and the release-meta rows do not block that first battle.
+
+| ID | Question | Blocks | Stand-in until answered |
 | --- | --- | --- | --- |
-| OQ-01 | Does a ship change hexes on a turn, and what is the movement budget for the player ship and for others? | Ships do not move. Weapons orient in place. | C-M1-03, later battles |
-| OQ-02 | Is there a hull facing in addition to per-weapon orientation? | Orientation is an absolute hex direction. No facing. | C-M1-03 |
-| OQ-03 | Which subsystems receive power, and may any power sit unallocated? | Drives, weapons, shields, sensors. Every point is assigned. | C-M1-05 |
-| OQ-04 | How is a ship destroyed, and can components be damaged rather than only toggled? What is the real component list? | Integer hull, destroyed at zero. Components are online or offline. Sample pair `sensor_lock` + `focused_lance`. | C-M1-04, C-M1-06, C-M1-07, C-M3-06 |
-| OQ-05 | Do all ships resolve at once, do sides alternate, or is there a speed or action-point system? | One prepare step, then a simultaneous resolve from the state at the start of it. | C-M1-03, C-M1-07 |
-| OQ-06 | How many ships are in a "small" squadron, and does the player set their components or only give orders? | Three ships. Commands are `focus` and `hold` only. | C-M2-06, C-M2-08 |
-| OQ-07 | What does an order require beyond the objective text, and what happens if the player ignores it? | The order is a sentence plus the objective id. Ignoring it has no extra penalty. | C-M1-02 |
-| OQ-08 | What does the player do to gather intel? | Scan a marked contact. Destroying it does not count. | C-M2-05 |
-| OQ-09 | If the hard objective fails, do high-value targets and intel already earned still stand, and can that outcome still matter to the war? | They stand, and the war continues. | C-M1-07, C-M2-04, C-M2-07, C-M4-04 |
-| OQ-10 | What is stored as the battle outcome, and do earlier outcomes change later battles? | Three visible lines: objective, high-value targets, intel. Later battles ignore the numbers. The map shows them. | C-M2-07, C-M4-04, C-M4-06 |
-| OQ-11 | Can the war end before ten battles? | All ten steps are played. | C-M4-01, C-M4-06 |
-| OQ-12 | What triggers frigate to cruiser to battleship, and is the change a refit or a new hull? | Refit offered after battle 3 and battle 7, on the ship-management screen. | C-M3-01 |
-| OQ-13 | Which captain and crew attributes exist, and what changes them? | Captain `citations`, crew `experience`, as in P-PRG-01. | C-M3-03, C-M3-04, C-M3-05 |
-| OQ-14 | When is the veteran chance rolled, and what does a veteran change? | Once, at run start, probability 1/10, starting experience 2. | C-M5-02 |
-| OQ-15 | Do medals persist across runs, and does ironman clear that store too? | Medals live inside the run. Ironman discards them with the run. | C-M5-01, C-M5-03 |
-| OQ-16 | Is there save and reload when ironman is off, mid-battle or only between battles? | The run is in memory only. | C-M5-03, architecture |
-| OQ-17 | Do armada ships run the full component, power, and orientation simulation? | Only the player ship does. Squadron is reduced. Armada is a volley stat. | C-M0-06, C-M2-01 |
-| OQ-18 | One opposing force or several, and do they have names? | Two factions, `own` and `enemy`, unnamed beyond that. | C-M2-02, content |
-| OQ-19 | Which platforms count as "multiple", and is mobile in scope? | Windows, Linux, macOS. Mobile excluded. Any two satisfy C-M5-06. | C-M5-06 |
-| OQ-20 | What may the player customize on the holotable, and does it persist past the session? | Four layer toggles, session only. | C-M5-04 |
-| OQ-21 | Is the optional third frame used, and what does it show? | Slot exists and stays empty. | C-M5-05 |
-| OQ-22 | What machine, and what turn time, define the 20,000-ship test? The count itself is a stand-in and may be raised. | Pass if the camera pans during the update and the window does not freeze. | C-M0-06, C-M2-01 |
-| OQ-23 | Which language? | Recommendation: Rust. See [§16](#16-language). | W-TEC-05, C-M5-06 |
-| OQ-24 | What does the ship-management subscreen change that the battle sidebars do not? | The subscreen fits and unfits components. The battle screen toggles fitted ones. | C-M3-02 |
+| OQ-25 | How many action points does a frigate, a cruiser, and a battleship have? | M1 | Frigate 6, cruiser 4, battleship 3 (P-TURN-01). |
+| OQ-26 | How much time or how many points does one hex-side of hull turn cost, and does braking take the whole turn the way acceleration does? | M1 | One point per hex side. Braking is a full-turn action (P-TURN-01). |
+| OQ-28 | What is the unit of "quicker" when assigning unassigned power, versus pulling power off a live subsystem? | M1 | Assigning reserve power is free inside the turn. Pulling power off a live subsystem costs one action point. |
+| OQ-29 | How does the player repair a power line or a repairable component, and what does it cost? | M1 | One action point clears one repairable cripple (P-REP-01). Dry-dock has no field repair. |
+| OQ-04 | What is the component catalog, and what amounts count as a crippled component, critical cooling or reactor damage, and dry-dock damage? | M1 | Typed hits, components sound or crippled (P-DMG-01). The sample synergy pair stays sample content. |
+| OQ-33 | Is evacuation the same event as abandonment, or can the crew evacuate while some combat components still work? | M1 | They are separate. Abandonment is every combat component crippled. Evacuation is a command the player can issue after repairable damage has disabled the ship. |
+| OQ-27 | Among ships that have enough action points, who acts first? | M2 | Player, then squadron, then the rest, each on the latest state (P-TURN-01). |
+| OQ-17 | Do ships far from the player simulate the power grid and component damage, or only the decided coarse facing and the action-point skip? | M2 | Far ships are a volley stat plus one facing (P-SIM-01). |
+| OQ-06 | Is a ship of the line a battleship or another hull, and is a strike craft its own ship or only a count on a wing? | M2, M3 | A ship of the line is a battleship that is not the flagship. A wing is one instance with a craft count (P-WING-01). |
+| OQ-08 | What does the player do to gather intel? | M2 | Scan a marked contact. Destroying it does not count (P-OUT-01). |
+| OQ-09 | If the hard objective fails, do high-value targets and intel already earned still stand? | M2 | They stand, and the war continues (P-OUT-01). |
+| OQ-10 | Besides the decided effect of an ignored order, what else is stored as the battle outcome, and do high-value targets and intel change later battles? | M2 readout, M4 consequences | Three visible lines. Later battles do not read them (P-OUT-01). |
+| OQ-30 | What is Squad Command's maximum, what raises it, and is there a gate below a battleship squadron? | M3 | Levels 0–3, up one when the squadron's order is carried out. No gate below battleship (P-SKL-01). |
+| OQ-12 | What triggers frigate to cruiser to battleship, and is the change a refit or a new hull? | M3 | Refit offered after battle 3 and battle 7 (P-FIT-01). |
+| OQ-13 | Which captain and crew attributes exist besides Squad Command, and what changes them? | M3 | Citations and crew experience (P-PRG-01). |
+| OQ-24 | What does the ship-management subscreen change that the battle sidebars do not? | M3 | The subscreen fits and unfits components. The battle screen toggles them and issues field repair. |
+| OQ-32 | What are the one or two special components each faction has, the ones the other side must capture? | M3 | Imperial `belt_plate`, Alliance `rapid_mount` (P-FCT-01). |
+| OQ-07 | How large is the "moderately outsized" campaign effect of an ignored order, and by what steps does the link to the strategic objective tighten across the ten battles? | M4 | The ignored order shifts the next battle's outcome lines by one step, and the link is a sentence in battle 1 and a second fail condition in battle 10. |
+| OQ-11 | Can the war end before ten battles? | M4 | All ten steps are played. |
+| OQ-31 | How does a boarding start, what is "in time", and what are the map and the standard gear? | M6, not M1 | Focus-to-capture on a fully crippled ship. Eight battle-turns. A corridor, a sidearm, and a cutter (P-BRD-01). |
+| OQ-14 | When is the veteran chance rolled, and what does a veteran change? | M5 | Once at run start, 1 in 10, starting experience 2 (P-VET-01). |
+| OQ-15 | Do medals persist across runs, and does ironman clear that store too? | M5 | Medals live inside the run. Ironman discards them with the run (P-MEDAL-01). |
+| OQ-16 | Is there save and reload when ironman is off? | M5 | The run is in memory only. |
+| OQ-20 | What may the player customize on the holotable, and does it persist past the session? | M5 | Four layer toggles, session only (P-UI-02). |
+| OQ-21 | Is the optional third frame used, and what does it show? | M5 | The slot stays empty (P-ART-02). |
+| OQ-22 | How much of a turn should run on the GPU, and what VRAM does that imply? Cores, RAM, and the one-second turn are already decided. | Release tuning, not M1 | Rendering stays on the CPU. VRAM is whatever the window needs. |
+
+### Closed questions
+
+Moved into the decided sections. The ids are kept so older notes still point somewhere.
+
+| ID | Now decided as |
+| --- | --- |
+| OQ-01 | Momentum, coasting, acceleration as a full-turn action, max 3 hexes. Costs of turning and braking remain OQ-26. |
+| OQ-02 | Separate hull and weapon facings. Distant ships use a cheap approximation. |
+| OQ-03 | The subsystem list, the generator and line grid, and unassigned power. The unit of "quicker" remains OQ-28. |
+| OQ-05 | Action points. Frigates have the most. Ships that cannot act are skipped. Amounts remain OQ-25. |
+| OQ-18 | Imperial Royal Navy and Allied People's Naval Forces. Component names remain OQ-32. |
+| OQ-19 | Windows and Linux. |
+| OQ-23 | Rust, under the coding guideline in §16. |
 
 ## 18. Section index
 
@@ -400,47 +478,54 @@ Each of these is a gap in the owner's design. The stand-in next to it is a way t
 | --- | --- |
 | 1 Pillars | Shape of M1–M4 |
 | 2 Glossary | Terms used by the boxes |
-| 3 War and battles | C-M4-01–C-M4-06, C-M2-07 |
-| 4 Turn structure | C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-09 |
-| 5 Battlefield and scale | C-M0-02, C-M0-03, C-M0-04, C-M0-06, C-M0-07, C-M2-01, C-M2-08 |
-| 6 Ships and components | C-M1-04, C-M1-06, C-M3-01, C-M3-02, C-M3-06 |
-| 7 Power | C-M1-05, C-M1-09 |
-| 8 Weapons | C-M1-03 |
+| 3 War and battles | C-M4-01–C-M4-08, C-M2-07, C-M2-11 |
+| 4 Turn structure | C-M1-03, C-M1-04, C-M1-05, C-M1-07, C-M1-08, C-M1-10–C-M1-12, C-M0-06, C-M2-10 |
+| 5 Battlefield and scale | C-M0-02–C-M0-04, C-M0-06, C-M0-07, C-M1-10, C-M2-01, C-M2-08, C-M2-09 |
+| 6 Ships and components | C-M1-04, C-M1-06, C-M1-07, C-M1-15–C-M1-18, C-M3-01, C-M3-02, C-M3-06 |
+| 7 Power | C-M1-05, C-M1-09, C-M1-13, C-M1-14 |
+| 8 Weapons | C-M1-03, C-M1-11, C-M2-09 |
 | 9 Objectives and intel | C-M1-01, C-M1-02, C-M1-07, C-M2-02–C-M2-05, C-M2-07, C-M4-04, C-M4-06 |
-| 10 Orders and squadron | C-M1-02, C-M2-06, C-M2-08 |
-| 11 Progression and meta | C-M3-01, C-M3-03–C-M3-06, C-M5-01–C-M5-03 |
+| 10 Orders and squadron | C-M1-02, C-M2-06, C-M2-08, C-M2-11, C-M3-07, C-M3-08, C-M4-07, C-M4-08 |
+| 11 Progression and meta | C-M3-01, C-M3-03–C-M3-07, C-M5-01–C-M5-03 |
+| Factions | C-M2-12, C-M3-09 |
+| Boarding | C-M6-01–C-M6-03 |
 | 12 UI and controls | C-M0-02–C-M0-05, C-M1-08, C-M1-09, C-M3-02, C-M3-05, C-M5-04 |
 | 13 Art | C-M0-07, C-M5-05 |
 | 14 Content files | C-M2-02, C-M2-03, C-M4-02, C-M4-05 |
-| 15 Architecture | C-M0-01, C-M0-06, C-M2-01, C-M5-06, C-M5-07 |
-| 16 Language | W-TEC-05, C-M0-06, C-M5-06, C-M5-07 |
+| 15 Architecture | C-M0-01, C-M0-06, C-M0-08, C-M0-09, C-M2-01, C-M5-06–C-M5-08 |
+| 16 Language and coding guideline | C-M0-08, C-M5-06, W-TEC-05 |
 | 17 Open questions | Gaps those boxes still have |
 
 ## 19. Proposal index
 
-Unapproved. Stretch wishes live in the wishlist and are tested by C-P-01, C-P-02, C-P-03, C-P-04, C-P-05, C-P-06, C-P-07, and C-P-08. The ids below are spec stand-ins only.
+Unapproved, and still this planning pass's own ideas. Stretch wishes in the wishlist are tested by C-P-02, C-P-03, C-P-04, C-P-05, C-P-06, C-P-07, and C-P-08. The earlier squadron-doctrine stretch is retired: the four commands are decided.
 
 | ID | Where | What it stands in for |
 | --- | --- | --- |
-| P-WAR-MAP | §3 | Map of ten steps, two choices, no extra strategic layer |
-| P-TURN-01 | §4 | Prepare, simultaneous resolve, report |
+| P-WAR-MAP | §3 | Map of ten steps, two choices, outcome lines stored |
+| P-TURN-01 | §4 | Who acts first, and sample action-point numbers |
 | P-HEX-01 | §5 | Axial hexes, directions 0–5 |
-| P-SIM-01 | §5 | Fidelity tiers and chunked parallel update |
+| P-SIM-01 | §5 | What far ships simulate besides facing and the action-point skip |
 | P-SIM-02 | §5 | Snapshot buffer to the renderer |
-| P-DMG-01 | §6 | Hull points, components online or offline |
-| P-FIT-01 | §6 | Sample slot and power budgets, sample refit timing |
+| P-DMG-01 | §6 | Sound-or-crippled components, typed hits |
+| P-FIT-01 | §6 | Sample slot and generator counts, sample refit timing |
 | P-SYNERGY-01 | §6 | Sample component pair |
-| P-POW-01 | §7 | Sample subsystems and a full allocation |
-| P-WPN-01 | §8 | Absolute hex-direction orientation and range |
+| P-POW-01 | §7 | Sample two-generator layout |
+| P-REP-01 | §7 | Field repair costs one action point |
+| P-WPN-01 | §8 | Facings as hex directions, sample "close" radius of 8 |
 | P-OUT-01 | §9 | Three-line outcome, sample strike, hold, and intel |
-| P-SQD-01 | §10 | Order text, squadron of three, focus or hold |
-| P-PRG-01 | §11 | Citations and experience |
+| P-WING-01 | §10 | A wing is one instance with a craft count |
+| P-SKL-01 | §10 | Squad Command levels 0–3 |
+| P-PRG-01 | §11 | Citations and experience, beside the decided Squad Command skill |
 | P-VET-01 | §11 | Veteran roll at run start |
 | P-MEDAL-01 | §11 | Sample medal |
+| P-FCT-01 | Factions | Sample capturable components |
+| P-BRD-01 | Boarding | How a boarding starts, the clock, the map, the gear |
 | P-UI-02 | §12 | Sidebar contents, subscreens, camera jumps, layer toggles |
 | P-UI-03 | §12 | Default bindings |
 | P-ART-02 | §13 | SVG source, sprite atlas at build |
 | P-DAT-01 | §14 | TOML content files |
 | P-ARC-01 | §15 | Content, simulation, presentation, command buffer |
-| P-LANG-01 | §16 | Recommend Rust |
-| P-PLAT-01 | §16 | Windows, Linux, macOS |
+
+Retired, because the owner answered them: the old hull-point destruction rule, the four-subsystem power budget that had to be fully assigned, the squadron of three with only focus and hold, the macOS platform guess, and the unapproved language recommendation.
+

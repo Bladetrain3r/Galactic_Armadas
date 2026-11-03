@@ -2,9 +2,11 @@
 
 Stage 2 of 3. Derived from [WISHLIST.md](WISHLIST.md). [SPEC.md](SPEC.md) is derived from this file. Build in milestone order: a minimal playable battle first, the full game last.
 
-A box is done when a person can perform the test and see the result. Wishlist ids in italics are the source of the box. Wishes about tone (W-FAN-02, W-FAN-03) and the language write-up (W-TEC-05) have no single box; the coverage table says where they went.
+A box is done when a person can perform the test and see the result. Wishlist ids in italics are the source of the box. Tone wishes (W-FAN-02, W-FAN-03) have no single box; the coverage table says where they went. The coding guideline (W-TEC-05) is C-M0-08 and [SPEC.md §16](SPEC.md#16-language-and-coding-guideline).
 
-**20,000 ships** is the acceptance stand-in for the decided phrase "tens of thousands" (W-ROL-01, W-TEC-04). It is a planning number so the test is concrete. Changing it is [OQ-22](SPEC.md#17-open-questions).
+Build order: Milestone 0, then 1 (the first playable battle), 2, 3, 4, 6 (boarding), then 5 (the release). Boarding is part of the full game and is not required to call Milestone 1 playable.
+
+**20,000 ships** is the acceptance stand-in for "tens of thousands" (W-ROL-01, W-TEC-04). A turn of that scene finishes in under a second (W-TEC-07). The count is a planning number. VRAM is still [OQ-22](SPEC.md#17-open-questions).
 
 Where a test needs a rule the owner has not set, the spec offers an unapproved stand-in and names the open question. The test below still describes the outcome the owner already asked for.
 
@@ -17,8 +19,10 @@ A development scene is enough. It does not need to be a real scenario. Placehold
 - [ ] **C-M0-03** The camera starts moderately zoomed in. The player can pan across the whole grid and zoom in and out. _W-FLD-02_
 - [ ] **C-M0-04** From elsewhere on the grid, the player can bring the view to their own ship, and to the hard objective, without scrolling the map by hand. _W-FLD-03_
 - [ ] **C-M0-05** Keyboard and mouse can both pan and zoom. _W-UI-06, W-UI-07_
-- [ ] **C-M0-06** A scene of at least 20,000 ship instances advances while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. _W-TEC-04, W-ROL-01_
+- [ ] **C-M0-06** A scene of at least 20,000 ship instances advances in under a second on 4 cores and 8 GB, with no other workload, while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. Ships without the action points to act are not given a decision. _W-TEC-04, W-TEC-07, W-ROL-01, W-AP-01_
 - [ ] **C-M0-07** At the starting zoom the view holds many ships, drawn as tactical icons on the holotable. _W-UI-04_
+- [ ] **C-M0-08** The first gameplay module is split by system, uses straightforward Rust, and a reader who writes little Rust can follow it. It does not rely on a stack of traits, macros, or other ceremony to say something simple. _W-TEC-05_
+- [ ] **C-M0-09** That scale scene also runs inside a container limited to 4 cores and 8 GB. _W-TEC-06, W-TEC-07_
 
 ## Milestone 1 — One ship, one puzzle
 
@@ -26,26 +30,39 @@ The smallest playable battle: one player ship, one hard objective, one turn loop
 
 - [ ] **C-M1-01** A battle starts with the player in command of one ship and with exactly one hard objective. _W-ROL-01, W-SCN-03_
 - [ ] **C-M1-02** The battle shows an order the player did not write, and the hard objective matches that order. _W-ROL-02_
-- [ ] **C-M1-03** Each turn the player sets every weapon's orientation. A shot resolves along the orientation set for that weapon. _W-CMB-01_
+- [ ] **C-M1-03** Each turn the player sets every weapon's facing, separate from the hull's facing. A shot resolves along the weapon facing. _W-CMB-01, W-FAC-01_
 - [ ] **C-M1-04** Each turn the player sets the state of each component on their ship, and resolution uses that state. _W-CMB-02, W-SHP-01_
-- [ ] **C-M1-05** Each turn the player moves power from one subsystem to another. The gain and the loss are both visible before the turn resolves. _W-CMB-03_
+- [ ] **C-M1-05** Each turn the player routes power among the decided subsystems. The gain and the loss are both visible before the turn resolves. _W-CMB-03, W-PWR-01_
 - [ ] **C-M1-06** With two named components online, a documented synergy changes a result. Turning either component off removes the synergy. _W-SHP-02_
-- [ ] **C-M1-07** The battle ends in success when its hard objective is completed, and in failure when the player ship is lost. What "lost" means is the damage stand-in in the spec until [OQ-04](SPEC.md#17-open-questions) is closed. _W-SCN-03_
-- [ ] **C-M1-08** A full turn — weapons, components, power, and end turn — can be played with the keyboard alone, and the same turn can be played with the mouse. _W-UI-06, W-UI-07_
-- [ ] **C-M1-09** During the battle the screen is two sidebars and the central grid, and weapons, components, and power are readable without leaving the battle. _W-UI-01, W-CMB-01, W-CMB-02, W-CMB-03_
+- [ ] **C-M1-07** The battle ends in success when its hard objective is completed. It ends in failure when the player ship is abandoned, evacuated, detonated, or disabled. _W-SCN-03, W-DMG-01, W-DMG-03, W-DMG-04_
+- [ ] **C-M1-08** A full turn — movement, facings, weapons, components, power, and end turn — can be played with the keyboard alone, and the same turn can be played with the mouse. _W-UI-06, W-UI-07_
+- [ ] **C-M1-09** During the battle the screen is two sidebars and the central grid, and weapons, components, facings, and power are readable without leaving the battle. _W-UI-01, W-CMB-01, W-CMB-02, W-CMB-03_
+- [ ] **C-M1-10** The player ship has momentum and coasts until it brakes or changes vector. Accelerating spends the whole turn. The ship never moves more than 3 hexes in that turn. _W-MOV-01, W-MOV-02_
+- [ ] **C-M1-11** Turning the hull takes time, and after a turn the hull facing and a weapon facing can disagree. _W-MOV-03, W-FAC-01_
+- [ ] **C-M1-12** Commands, including movement, spend action points. A frigate's pool is larger than a cruiser's and a battleship's. A ship with no points left receives no new decision that turn. _W-AP-01, W-AP-02, W-MOV-04_
+- [ ] **C-M1-13** The player can leave power unassigned, then put it on shields faster than they can take the same amount off a subsystem that is already drawing it. _W-PWR-04_
+- [ ] **C-M1-14** The player ship has more than one generator, distribution nodes, and power lines. Diverting a line changes what it feeds. Damaging a main line out of a generator lowers how much power can reach a subsystem. Repairing that line restores the delivery. _W-PWR-02, W-PWR-03_
+- [ ] **C-M1-15** A regular or focused hit applies repairable damage and can take a component offline. The run continues. _W-DMG-01_
+- [ ] **C-M1-16** Crippling every combat-capable component abandons the ship and fails the battle. _W-DMG-03_
+- [ ] **C-M1-17** Critical damage to cooling or to the reactor can detonate the ship and fail the battle. A hit that is not critical does not detonate it. _W-DMG-04_
+- [ ] **C-M1-18** Dry-dock damage, a massive hole or shredded chassis, ends the run. _W-DMG-02_
 
 ## Milestone 2 — The battle around the ship
 
 The same puzzle, inside the armada it belongs to.
 
-- [ ] **C-M2-01** A played battle, past the Milestone 0 development scene, instances at least 20,000 ships. The player's next turn stays responsive while they advance. _W-ROL-01, W-TEC-04_
+- [ ] **C-M2-01** A played battle, past the Milestone 0 development scene, instances at least 20,000 ships. The player's next turn stays responsive, and processing that turn stays under a second on the Milestone 0 machine. _W-ROL-01, W-TEC-04, W-TEC-07_
 - [ ] **C-M2-02** A strike battle's hard objective is a marked command ship, communication node, or other designated target, and that target is visually distinct from other ships. _W-SCN-01, W-SCN-03_
 - [ ] **C-M2-03** A hold battle's hard objective is to keep the player ship alive until a counterattack arrives, and the counterattack is an event the player can see. _W-SCN-02, W-SCN-03_
 - [ ] **C-M2-04** Destroying a marked high-value target that is not the hard objective improves the recorded battle outcome. Leaving it alive does not. _W-SCN-04, W-SCN-06_
 - [ ] **C-M2-05** An intel action, distinct from the hard objective, improves the recorded battle outcome. Skipping it does not. _W-SCN-05, W-SCN-06_
-- [ ] **C-M2-06** One battle gives the player a small squadron and a command that changes what those ships do. Another battle has no squadron. Both show an order from outside the player. _W-ROL-02_
+- [ ] **C-M2-06** One battle gives the player a frigate squadron: the player's frigate as C2, 2 to 4 escorts, and, when the battle includes them, 8 strike craft in 2 wings. Focus, hold, protect, and follow each change what those ships do. Another battle has no squadron. Both show an order from outside the player. _W-ROL-02, W-SQD-01, W-SQD-02_
 - [ ] **C-M2-07** The battle outcome is shown as its own readout, separate from the objective's success or failure. _W-SCN-06_
-- [ ] **C-M2-08** The player cannot command ships outside their own ship and their squadron. Those ships still act. _W-ROL-03_
+- [ ] **C-M2-08** The player has no command over ships outside their own ship and their squadron. Those ships still act. _W-ROL-03_
+- [ ] **C-M2-09** A ship far from the player shows a coarse facing. A ship close to the player shows its real hull facing and weapon facings. _W-FAC-02_
+- [ ] **C-M2-10** In that large battle, ships without enough action points to act are skipped, and ships with points still act. _W-AP-01_
+- [ ] **C-M2-11** The battle states a strategic objective for each side, and the player's order is the part of their side's objective they were given. _W-ORD-02_
+- [ ] **C-M2-12** Ships of the Imperial Royal Navy and the Allied People's Naval Forces are both present and named. An Imperial ship of a class weathers more than the Alliance ship of that class. The Alliance ship hits harder. _W-FCT-01, W-FCT-02_
 
 ## Milestone 3 — Ship, captain, crew
 
@@ -57,6 +74,9 @@ Progression across battles. A session that passes through all three classes is e
 - [ ] **C-M3-04** The crew persists from battle to battle, and at least one visible value changes because of a battle's result. _W-PRG-03_
 - [ ] **C-M3-05** A progression subscreen shows ship class, captain, and crew, including the change from the latest battle. _W-UI-03, W-PRG-01, W-PRG-02, W-PRG-03_
 - [ ] **C-M3-06** A cruiser or battleship build can express a synergy the starting frigate fit cannot, using the same synergy rule as C-M1-06. _W-SHP-02, W-PRG-01_
+- [ ] **C-M3-07** Squad Command is visible and can increase. Below its maximum, a battleship squadron cannot be ordered. At the maximum, the player can command one: 1 flagship, 2 ships of the line, 8 supporting cruisers or frigates, and 16 to 32 strike craft. _W-SQD-01, W-SQD-03_
+- [ ] **C-M3-08** A cruiser squadron is 1 to 2 cruisers, 2 to 4 frigates, and 16 strike craft in 4 wings, and it accepts the same four commands as C-M2-06. _W-SQD-01, W-SQD-02_
+- [ ] **C-M3-09** Fighting the other faction, the player can capture one of its special components and fit it. _W-FCT-02_
 
 ## Milestone 4 — A war of ten battles
 
@@ -68,6 +88,16 @@ The roguelike run.
 - [ ] **C-M4-04** After a battle, its outcome is visible on the war map before the next choice. _W-SCN-06, W-WAR-01_
 - [ ] **C-M4-05** A thrust choice uses a strike objective (C-M2-02). A hold choice uses a hold objective (C-M2-03). _W-WAR-02, W-SCN-01, W-SCN-02_
 - [ ] **C-M4-06** Finishing the tenth battle ends the run and shows the outcome of each battle. _W-WAR-01, W-SCN-06_
+- [ ] **C-M4-07** Ignoring an order, when no other ship carries it out, changes the campaign by more than ignoring a side target does. If another ship carries the order out, that larger change does not land. _W-ORD-01_
+- [ ] **C-M4-08** The player's order is tied more tightly to their side's strategic objective in a late battle than in the first battle. _W-ORD-02_
+
+## Milestone 6 — Boarding
+
+Build this once Milestone 1 can damage a ship. It is not part of the first playable battle. The release in Milestone 5 includes it.
+
+- [ ] **C-M6-01** From a battle, the player enters a boarding action that plays as its own roguelike and takes about 5 to 10 minutes. _W-BRD-01_
+- [ ] **C-M6-02** Taking both the bridge and engineering before time runs out captures the ship. Failing either one auto-destructs it. _W-BRD-02_
+- [ ] **C-M6-03** The player's boarding kit is a shorter equipment list than the ship build. The player's crew and the defenders are both issued standard gear from that list. _W-BRD-03_
 
 ## Milestone 5 — Meta, holotable, ship it
 
@@ -78,14 +108,14 @@ The decided game around the run, and a build someone else can launch.
 - [ ] **C-M5-03** With ironman on, loss of the player ship ends the run (the escape pod fails). The next run starts from scratch: a new frigate, a new captain, and a new crew. _W-MET-03_
 - [ ] **C-M5-04** The player can change at least one thing about the holotable layout, and the change lasts for the session. Whether it lasts longer is [OQ-20](SPEC.md#17-open-questions). _W-UI-05_
 - [ ] **C-M5-05** Every entity type used in a battle has an idle frame and an attack frame, in a sprite/SVG style, and no entity uses more than three frames. _W-ART-01, W-ART-02_
-- [ ] **C-M5-06** A release is a standalone binary, plus only the files beside it that it needs, for more than one platform. It starts with no preinstalled language runtime. _W-TEC-01, W-TEC-03_
-- [ ] **C-M5-07** That release can run the Milestone 0 scale scene and a Milestone 2 battle. _W-TEC-03, W-TEC-04_
+- [ ] **C-M5-06** A release is a standalone binary, plus only the files beside it that it needs, for Windows and for Linux. It starts with no preinstalled language runtime. _W-TEC-01, W-TEC-03_
+- [ ] **C-M5-07** That release can run the Milestone 0 scale scene and a Milestone 2 battle, and a turn of each finishes in under a second. _W-TEC-03, W-TEC-04, W-TEC-07_
+- [ ] **C-M5-08** The release states 16 GB of RAM as the official minimum. _W-TEC-07_
 
 ## Not scheduled — proposed stretch
 
 These boxes exist so the Could-items in the wishlist have a test. They are not part of the milestones. Accepting one is an owner decision.
 
-- [ ] **C-P-01** The player sets a squadron doctrine and the squadron ships keep it while the player runs their own turn. _P-ROL-01_
 - [ ] **C-P-02** A battle contains a scripted complication and still has exactly one hard objective. _P-SCN-01_
 - [ ] **C-P-03** A content pack of a component and a scenario loads from data files and appears in game with no code change. _P-SHP-01_
 - [ ] **C-P-04** The war map's front marker moves after a thrust outcome and after a hold outcome, in different directions. _P-WAR-01_
@@ -109,6 +139,32 @@ Every decided wish is listed. "Shape" means the milestones produce it and no sin
 | W-CMB-01 | C-M1-03, C-M1-09 |
 | W-CMB-02 | C-M1-04, C-M1-09 |
 | W-CMB-03 | C-M1-05, C-M1-09 |
+| W-MOV-01 | C-M1-10 |
+| W-MOV-02 | C-M1-10 |
+| W-MOV-03 | C-M1-11 |
+| W-MOV-04 | C-M1-12 |
+| W-FAC-01 | C-M1-03, C-M1-11 |
+| W-FAC-02 | C-M2-09 |
+| W-AP-01 | C-M0-06, C-M1-12, C-M2-10 |
+| W-AP-02 | C-M1-12 |
+| W-PWR-01 | C-M1-05 |
+| W-PWR-02 | C-M1-14 |
+| W-PWR-03 | C-M1-14 |
+| W-PWR-04 | C-M1-13 |
+| W-DMG-01 | C-M1-07, C-M1-15 |
+| W-DMG-02 | C-M1-18 |
+| W-DMG-03 | C-M1-07, C-M1-16 |
+| W-DMG-04 | C-M1-07, C-M1-17 |
+| W-BRD-01 | C-M6-01 |
+| W-BRD-02 | C-M6-02 |
+| W-BRD-03 | C-M6-03 |
+| W-SQD-01 | C-M2-06, C-M3-07, C-M3-08 |
+| W-SQD-02 | C-M2-06, C-M3-08 |
+| W-SQD-03 | C-M3-07 |
+| W-ORD-01 | C-M4-07 |
+| W-ORD-02 | C-M2-11, C-M4-08 |
+| W-FCT-01 | C-M2-12 |
+| W-FCT-02 | C-M2-12, C-M3-09 |
 | W-SHP-01 | C-M1-04, C-M3-01, C-M3-02 |
 | W-SHP-02 | C-M1-06, C-M3-06 |
 | W-PRG-01 | C-M3-01, C-M3-05, C-M3-06 |
@@ -141,6 +197,8 @@ Every decided wish is listed. "Shape" means the milestones produce it and no sin
 | W-TEC-02 | C-M0-01 |
 | W-TEC-03 | C-M5-06, C-M5-07 |
 | W-TEC-04 | C-M0-06, C-M2-01, C-M5-07 |
-| W-TEC-05 | [SPEC.md §16](SPEC.md#16-language). Comparison and a recommendation; the choice stays open |
+| W-TEC-05 | C-M0-08, [SPEC.md §16](SPEC.md#16-language-and-coding-guideline) |
+| W-TEC-06 | C-M0-09 |
+| W-TEC-07 | C-M0-06, C-M0-09, C-M2-01, C-M5-07, C-M5-08 |
 
-Proposed stretch wishes are the C-P boxes above, one each.
+Proposed stretch wishes are the C-P boxes above, one each. Squadron commands are the decided set in W-SQD-02.
