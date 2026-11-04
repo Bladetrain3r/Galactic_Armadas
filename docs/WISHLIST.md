@@ -32,6 +32,14 @@ Tone and craft references, with this game's own mechanics: Rift Wizard and Deskt
 | W-ROL-02 | Must | The player takes orders, and in some battles commands a squadron. |
 | W-ROL-03 | Must | The player is a captain inside the armada. Ships outside their ship and their squadron fight on orders of their own. |
 
+### Proposed
+
+Not decided. The owner's sketch of how the armada thinks. Accepting it is an owner decision.
+
+| ID | Tag | Wish |
+| --- | --- | --- |
+| P-ROL-01 | Could | AI commanders issue goals: what needs to happen, not how. Ships far from the player operate as shoals and decide for themselves how to approach those goals. Ships close to the player get a full individual decision. A turn of that scene still finishes in under a second. |
+
 ## Combat puzzle
 
 | ID | Tag | Wish |
@@ -203,6 +211,7 @@ Thrust is the offensive choice and lines up with strike scenarios (W-SCN-01). Ho
 | ID | Tag | Wish |
 | --- | --- | --- |
 | P-FLD-01 | Could | A far zoom shows the armada as a readable picture. Commands stay at the normal zoom. |
+| P-FLD-02 | Could | A battle can place local terrain and one battlefield-wide modifier. Not designed yet. Starter ideas only: nebulae shorten sensor and targeting range; debris blocks or slows movement and gives cover; gravity wells bend momentum; ion storms disrupt power lines and shields; minefields; a battle-wide effect such as a solar flare, or comms jamming that affects squad commands. |
 
 ## Interface
 

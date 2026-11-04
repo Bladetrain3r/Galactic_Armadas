@@ -14,14 +14,14 @@ Where a test needs a rule the owner has not set, the box uses the tuning default
 
 A development scene is enough. It does not need to be a real scenario. Placeholder icons are enough.
 
-- [ ] **C-M0-01** The application opens a window, draws through SDL, and exits cleanly. _W-TEC-01, W-TEC-02_
-- [ ] **C-M0-02** The central view draws a hex grid large enough for a battle, between two sidebars. _W-FLD-01, W-UI-01_
-- [ ] **C-M0-03** The camera starts moderately zoomed in. The player can pan across the whole grid and zoom in and out. _W-FLD-02_
-- [ ] **C-M0-04** From elsewhere on the grid, the player can bring the view to their own ship, and to the hard objective, without scrolling the map by hand. _W-FLD-03_
-- [ ] **C-M0-05** Keyboard and mouse can both pan and zoom. _W-UI-06, W-UI-07_
-- [ ] **C-M0-06** A scene of at least 20,000 ship instances advances in under a second on 4 cores and 8 GB, with no other workload, while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. Ships without the action points to act are not given a decision. _W-TEC-04, W-TEC-07, W-ROL-01, W-AP-01_
-- [ ] **C-M0-07** At the starting zoom the view holds many ships, drawn as tactical icons on the holotable. _W-UI-04_
-- [ ] **C-M0-08** The first gameplay module is split by system, uses straightforward Rust, and a reader who writes little Rust can follow it. It does not rely on a stack of traits, macros, or other ceremony to say something simple. _W-TEC-05_
+- [x] **C-M0-01** The application opens a window, draws through SDL, and exits cleanly. _W-TEC-01, W-TEC-02_
+- [x] **C-M0-02** The central view draws a hex grid large enough for a battle, between two sidebars. _W-FLD-01, W-UI-01_
+- [x] **C-M0-03** The camera starts moderately zoomed in. The player can pan across the whole grid and zoom in and out. _W-FLD-02_
+- [x] **C-M0-04** From elsewhere on the grid, the player can bring the view to their own ship, and to the hard objective, without scrolling the map by hand. _W-FLD-03_
+- [x] **C-M0-05** Keyboard and mouse can both pan and zoom. _W-UI-06, W-UI-07_
+- [x] **C-M0-06** A scene of at least 20,000 ship instances advances in under a second on 4 cores and 8 GB, with no other workload, while the window keeps accepting input and drawing. The update does not hold one lock around the whole step. Ships without the action points to act are not given a decision. _W-TEC-04, W-TEC-07, W-ROL-01, W-AP-01_
+- [x] **C-M0-07** At the starting zoom the view holds many ships, drawn as tactical icons on the holotable. _W-UI-04_
+- [x] **C-M0-08** The first gameplay module is split by system, uses straightforward Rust, and a reader who writes little Rust can follow it. It does not rely on a stack of traits, macros, or other ceremony to say something simple. _W-TEC-05_
 - [ ] **C-M0-09** That scale scene also runs inside a container limited to 4 cores and 8 GB. _W-TEC-06, W-TEC-07_
 
 ## Milestone 1 — One ship, one puzzle
@@ -66,6 +66,8 @@ The same puzzle, inside the armada it belongs to.
 - [ ] **C-M2-11** The battle states a strategic objective for each side, and the player's order is the part of their side's objective they were given. _W-ORD-02_
 - [ ] **C-M2-12** Ships of the Imperial Royal Navy and the Allied People's Naval Forces are both present and named. An Imperial ship of a class weathers more than the Alliance ship of that class. The Alliance ship hits harder. _W-FCT-01, W-FCT-02_
 - [ ] **C-M2-13** A ship immediately next to the player has an interior of the same kind as the player's. A ship far from the player does not. _W-INT-02_
+
+Terrain and shoal AI are not part of this milestone. The unscheduled placeholders are C-P-09 and C-P-10.
 
 ## Milestone 3 — Ship, captain, crew
 
@@ -127,6 +129,8 @@ These boxes exist so the Could-items in the wishlist have a test. They are not p
 - [ ] **C-P-06** Zoomed fully out, the armada is readable, and weapon, component, and power commands are unavailable at that zoom. _P-FLD-01_
 - [ ] **C-P-07** The player rebinds a command and the new key performs it. _P-UI-01_
 - [ ] **C-P-08** An order arriving, and a counterattack arriving, each play a short stinger or chatter line. _P-ART-01_
+- [ ] **C-P-09** A battle includes one local terrain and one battlefield-wide modifier, and each changes a stated result. The examples in P-FLD-02 are suggestions until the owner accepts a set. _P-FLD-02_
+- [ ] **C-P-10** Far from the player, ships move as shoals toward a goal an AI commander set. Next to the player, those ships are decided one by one. A turn of the 20,000-ship scene stays under a second. _P-ROL-01_
 
 ## Coverage
 

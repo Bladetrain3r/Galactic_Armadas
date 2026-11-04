@@ -45,6 +45,25 @@ Ids match the old open-question numbers (`TD-34` was `OQ-34`) so earlier notes s
 
 The sample synergy pair `sensor_lock` plus `focused_lance` is the content loaded for the first synergy test. It is sample content in [SPEC §6](SPEC.md#6-ships-and-components), not a faction or a final catalog.
 
+## Milestone 0 scale scene
+
+Added for the first window. These are defaults, not owner decisions. The rows above are unchanged.
+
+### Deviation
+
+Rendering uses the `sdl2` crate 0.38 (`bundled`, `static-link`), not SDL3. [SPEC §16](SPEC.md#16-language-and-coding-guideline) names SDL3 as the target and tells the build to start on the mature SDL2 crate if the SDL3 bindings would block Milestone 0. The `sdl3` crate's own readme, at 0.22, still says the migration is in progress and that features are missing. The sim/render split does not depend on which SDL this is.
+
+The scene drifts ships. It does not resolve a battle turn. That is the Milestone 0 development scene.
+
+### Defaults
+
+| ID | Default | Why this one | Lives in |
+| --- | --- | --- | --- |
+| TD-M0-VIEW | Pointy-top hexes. A hex is 22 px from center to corner at zoom 1, which is the opening zoom. Zoom clamps to 0.06–2.5. Arrow keys pan at 900 screen pixels per second. The wheel and `-` / `=` multiply zoom by 1.12 around the cursor. | Zoom 1 shows many ships and not the whole armada. 0.06 fits the radius-82 map in a modest window. | `src/camera.rs` |
+| TD-M0-LOD | A facing chevron at 14 px and above, a diamond from 5 px, a point below that. Grid outlines are skipped below 3.5 px, and only every fifth hex is drawn from 3.5 to 8 px. | Drawing 20,000 outlines is the cost that does not buy a readable picture. | `src/render.rs` |
+| TD-M0-SIM | 20,000 ships on a map of radius 82. The sim thread steps at 30 Hz. Drift is about 0.15 hex per second. Aside from the player, one ship in eight starts with 0 action points and is never given a decision. The player is an Imperial frigate at (0, 0) with 10 AP. The objective marker is an Alliance ship at (60, −24). | TD-SCALE is the count. The rest makes the skip rule and the two camera jumps visible. | `src/sim.rs` |
+| TD-M0-COLOR | Imperial crimson (196, 64, 72). Alliance blue (64, 140, 210). The player outline is gold. The objective outline is amber. | Placeholder heraldry until OWN-01. The two colours have to separate at point size. | `src/ship.rs`, `src/render.rs` |
+
 ## Owner-only
 
 Taste and lore. Nothing in the build waits on these. Placeholder ids in TD-32 are what the game loads until they are replaced.
