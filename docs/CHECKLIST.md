@@ -67,6 +67,8 @@ The same puzzle, inside the armada it belongs to.
 - [ ] **C-M2-12** Ships of the Imperial Royal Navy and the Allied People's Naval Forces are both present and named. An Imperial ship of a class weathers more than the Alliance ship of that class. The Alliance ship hits harder. _W-FCT-01, W-FCT-02_
 - [ ] **C-M2-13** A ship immediately next to the player has an interior of the same kind as the player's. A ship far from the player does not. _W-INT-02_
 
+Terrain and shoal AI are not part of this milestone. The unscheduled placeholders are C-P-09 and C-P-10.
+
 ## Milestone 3 — Ship, captain, crew
 
 Progression across battles. A session that passes through all three classes is enough; the ten-battle map arrives in Milestone 4.
@@ -127,6 +129,8 @@ These boxes exist so the Could-items in the wishlist have a test. They are not p
 - [ ] **C-P-06** Zoomed fully out, the armada is readable, and weapon, component, and power commands are unavailable at that zoom. _P-FLD-01_
 - [ ] **C-P-07** The player rebinds a command and the new key performs it. _P-UI-01_
 - [ ] **C-P-08** An order arriving, and a counterattack arriving, each play a short stinger or chatter line. _P-ART-01_
+- [ ] **C-P-09** A battle includes one local terrain and one battlefield-wide modifier, and each changes a stated result. The examples in P-FLD-02 are suggestions until the owner accepts a set. _P-FLD-02_
+- [ ] **C-P-10** Far from the player, ships move as shoals toward a goal an AI commander set. Next to the player, those ships are decided one by one. A turn of the 20,000-ship scene stays under a second. _P-ROL-01_
 
 ## Coverage
 

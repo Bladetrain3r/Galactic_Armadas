@@ -73,6 +73,8 @@ Read the pipeline in order. Each document cites the one before it. Tuning defaul
 
 [Tuning defaults](docs/TUNING.md) — every unset number and rule, in one table, with the one lore question that is still open.
 
+[Handover](docs/HANDOVER.md) — where the build stands tonight. Not a design stage.
+
 ## License
 
 [MIT](LICENSE).
